@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	{% block head %}
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>ACM UNO Chapter | {% block title %}{% endblock %}</title>
+	<link rel="stylesheet" href="{{url_for('static', filename='css/bootstrap.min.css')}}">
+	<link rel="stylesheet" href="{{url_for('static', filename='css/main.css')}}">
+	{% endblock %}
+</head>
+<body>
+	<div id="header">
+		{% block header %}
+		<nav id="navigation_section" class="navbar navbar-expand-lg navbar-light bg-light">
+			<a class="navbar-brand" href="{{url_for('index')}}"><img src="{{url_for('static', filename='images/ACM_logo_longer.png')}}" alt="ACM Logo"></a>
+			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+			<div class="navbar-nav">
+				<a class="nav-item nav-link {% block about_active %}{% endblock %}" href="{{url_for('about')}}">About us</a>
+				<a class="nav-item nav-link {% block events_active %}{% endblock %}" href="{{url_for('events')}}">Events</a>
+			</div>
+			</div>
+		</nav>
+		{% endblock  %}
+	</div>
+	<div id="content">
+		{% block content %}
+		{% endblock %}
+	</div>
+	<div id="footer">
+		{% block footer %}
+		<footer class="pt-4">
+			<div id="inner_footer" class="container-fluid text-md-left">
+				<img id="uno_logo" src="{{url_for('static', filename='images/UNO_Logo.png')}}" alt="UNO Logo">
+				<div id="copyright">
+					© 2018 Copyright: UNO ACM College Chapter
+				</div>
+			</div>
+		</footer>
+		<script src="{{url_for('static', filename='js/jquery-3.3.1.min.js')}}"></script>
+		<script src="{{url_for('static', filename='js/popper.min.js')}}"></script>
+		<script src="{{url_for('static', filename='js/bootstrap.min.js')}}"></script>
+		{% endblock %}
+	</div>
+</body>
+</html>
