@@ -12,3 +12,6 @@ def about():
 @app.route('/events')
 def events():
 	return render_template('events.html')
+
+if __name__ == "__main__":
+	app.run()
