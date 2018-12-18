@@ -13,14 +13,17 @@
 	<div id="header">
 		{% block header %}
 		<nav id="navigation_section" class="navbar navbar-expand-lg navbar-light">
-			<a class="navbar-brand" href="{{url_for('index')}}"><img src="{{url_for('static', filename='images/ACM_logo_longer.png')}}" alt="ACM Logo"></a>
+			<a class="navbar-brand" href="{{url_for('main.index')}}"><img src="{{url_for('static', filename='images/ACM_logo_longer.png')}}" alt="ACM Logo"></a>
 			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
 			<span class="navbar-toggler-icon"></span>
 			</button>
 			<div class="collapse navbar-collapse" id="navbarNavAltMarkup">
 			<div class="navbar-nav">
-				<a class="nav-item nav-link {% block about_active %}{% endblock %}" href="{{url_for('about')}}">About us</a>
-				<a class="nav-item nav-link {% block events_active %}{% endblock %}" href="{{url_for('events')}}">Events</a>
+				<a class="nav-item nav-link {% block about_active %}{% endblock %}" href="{{url_for('main.about')}}">About us</a>
+				<a class="nav-item nav-link {% block events_active %}{% endblock %}" href="{{url_for('main.events')}}">Events</a>
+				<a class="nav-item nav-link {% block blog_active %}{% endblock %}" href="{{url_for('blog.index')}}">Blog</a>
+				<a class="nav-item nav-link {% block suggestions_active %}{% endblock %}" href="{{url_for('main.suggestions')}}">Suggestions</a>
+				<a class="nav-item nav-link {% block documents_active %}{% endblock %}" href="{{url_for('main.documents')}}">Documents</a>
 			</div>
 			</div>
 		</nav>
