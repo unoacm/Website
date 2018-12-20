@@ -31,6 +31,12 @@ class AdminEditForm(FlaskForm):
 	password = PasswordField("Password: ")
 	submit = SubmitField("Create")
 
+class MemberCreateForm(FlaskForm):
+	first_name = StringField("First Name: ", validators=[DataRequired()])
+	last_name = StringField("Last Name: ", validators=[DataRequired()])
+	email = StringField("Email: ")
+	submit = SubmitField("Create")
+
 blueprint = Blueprint('admin', __name__, url_prefix='/admin')
 
 @blueprint.route('/')
@@ -38,7 +44,9 @@ def index():
 	if not authentication.isLoggedIn('admin'):
 		return redirect(url_for('admin.login'))
 	admins = admin_models.User.query.all()
-	return render_template('admin/index.html', admins=admins)
+	members = main_models.Member.query.all()
+	suggestions = main_models.Suggestion.query.all()
+	return render_template('admin/index.html', admins=admins, members=members, suggestions=suggestions)
 
 @blueprint.route('/login', methods=['GET', 'POST'])
 def login():
@@ -78,7 +86,7 @@ def admin_new():
 		db.session.commit()
 		return redirect(url_for('admin.index'))
 	
-	return render_template('admin/admin-form.html', form=createForm)
+	return render_template('admin/admin-form.html', form=createForm, type='new')
 
 @blueprint.route('/<int:user_id>/edit', methods=['GET', 'POST'])
 def admin_edit(user_id):
@@ -103,7 +111,7 @@ def admin_edit(user_id):
 		return redirect(url_for('admin.index'))
 
 	createForm.username.data = editingUser.username
-	return render_template('admin/admin-form.html', form=createForm)
+	return render_template('admin/admin-form.html', form=createForm, type='edit')
 
 @blueprint.route('/<int:user_id>/delete', methods=['POST'])
 def admin_delete(user_id):
@@ -113,5 +121,64 @@ def admin_delete(user_id):
 	if editingUser == None:
 		return redirect(url_for('admin.index'))
 	admin_models.User.query.filter_by(id=user_id).delete()
+	db.session.commit()
+	return redirect(url_for('admin.index'))
+
+@blueprint.route('/member/new', methods=['GET', 'POST'])
+def member_new():
+	if not authentication.isLoggedIn('admin'):
+		return redirect(url_for('admin.login'))
+	
+	memberForm = MemberCreateForm()
+	if memberForm.validate_on_submit():
+		first_name = memberForm.first_name.data
+		last_name = memberForm.last_name.data
+		if memberForm.email.data == "":
+			email = None
+		else:
+			email = memberForm.email.data
+
+		newMember = main_models.Member(first_name=first_name, last_name=last_name, email=email)
+		db.session.add(newMember)
+		db.session.commit()
+		return redirect(url_for('admin.index'))
+	
+	return render_template('admin/member-form.html', form=memberForm, type='new')
+
+@blueprint.route('/member/<int:member_id>/edit', methods=['GET', 'POST'])
+def member_edit(member_id):
+	if not authentication.isLoggedIn('admin'):
+		return redirect(url_for('admin.login'))
+	editingMember = main_models.Member.exists_id(member_id)
+	if editingMember == None:
+		return redirect(url_for('admin.index'))
+
+	memberForm = MemberCreateForm()
+	if memberForm.validate_on_submit():
+		first_name = memberForm.first_name.data
+		last_name = memberForm.last_name.data
+		if memberForm.email.data == "":
+			email = None
+		else:
+			email = memberForm.email.data
+		editingMember.first_name = first_name
+		editingMember.last_name = last_name
+		editingMember.email = email
+		db.session.commit()
+		return redirect(url_for('admin.index'))
+
+	memberForm.first_name.data = editingMember.first_name
+	memberForm.last_name.data = editingMember.last_name
+	memberForm.email.data = editingMember.email
+	return render_template('admin/member-form.html', form=memberForm, type='edit')
+
+@blueprint.route('/member/<int:member_id>/delete', methods=['POST'])
+def member_delete(member_id):
+	if not authentication.isLoggedIn('admin'):
+		return redirect(url_for('admin.login'))
+	editingMember = main_models.Member.exists_id(member_id)
+	if editingMember == None:
+		return redirect(url_for('admin.index'))
+	main_models.Member.query.filter_by(id=member_id).delete()
 	db.session.commit()
 	return redirect(url_for('admin.index'))

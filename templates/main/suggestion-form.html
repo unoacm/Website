@@ -6,7 +6,13 @@
 <div class="container">
 	{{ utils.flashes() }}
 	<div class="form-header">
-		<h1>Give a Suggestion</h1>
+		<h1>
+			{% if type == 'new' %}
+				Give a Suggestion
+			{% elif type == 'edit' %}
+				Edit Suggestion
+			{% endif %}
+		</h1>
 		{{ utils.make_form(form) }}
 	</div>
 </div>

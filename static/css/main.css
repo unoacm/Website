@@ -51,7 +51,7 @@ footer
 {
 	position: absolute;
 	left: 43%;
-	margin-top: 45px;
+	margin-top: 30px;
 }
 
 .flashes
@@ -59,11 +59,12 @@ footer
 	list-style: none;
 }
 
-#admin-section
+#admin-section, #member-section, #suggestion-section
 {
-	width: 30%;
-	margin: 30px;
-	border: 1px solid #DEDEDE
+	margin-top: 30px;
+	margin-left: 10px;
+	margin-right: 10px;
+	border: 1px solid #DEDEDE;
 }
 
 .section-header

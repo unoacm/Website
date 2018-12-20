@@ -2,33 +2,109 @@
 {% block dashboard_active %}active{% endblock %}
 {% block content %}
 	{{super()}}
-	<div id="admin-section">
-		<h2 class="section-header">Admins</h2>
-		<span class="section-add">
-			<a href="{{url_for('admin.admin_new')}}"><img class="icon" src="{{url_for('static', filename='icons/si-glyph-plus.svg')}}" ></a>
-		</span>
-		<hr>
-		<div class="data-section">
-			<table>
-				<tr>
-					<th>ID</th>
-					<th>Username</th>
-					<th>Edit</th>
-					<th>Delete</th>
-				</tr>
-				{% for admin in admins %}
-					<tr>
-						<td><strong>{{admin.id}}</strong></td>
-						<td>{{admin.username}}</td>
-						<td><a href="{{url_for('admin.admin_edit', user_id=admin.id)}}"><img class="icon" src="{{url_for('static', filename='icons/si-glyph-edit.svg')}}" /></a></td>
-						<td>
-							<form action="{{url_for('admin.admin_delete', user_id=admin.id)}}" method="POST">
-								<input class="icon" type="image" name="submit" src="{{url_for('static', filename='icons/si-glyph-delete.svg')}}">
-							</form>
-						</td>
-					</tr>
-				{% endfor %}
-			</table>
+	<div class="row">
+		<div class="col-md">
+			<div id="admin-section">
+				<h2 class="section-header">Admins</h2>
+				<span class="section-add">
+					<a href="{{url_for('admin.admin_new')}}"><img class="icon" src="{{url_for('static', filename='icons/si-glyph-plus.svg')}}" ></a>
+				</span>
+				<hr>
+				<div class="data-section">
+					<table>
+						<tr>
+							<th>ID</th>
+							<th>Username</th>
+							<th>Edit</th>
+							<th>Delete</th>
+						</tr>
+						{% for admin in admins %}
+							<tr>
+								<td><strong>{{admin.id}}</strong></td>
+								<td>{{admin.username}}</td>
+								<td><a href="{{url_for('admin.admin_edit', user_id=admin.id)}}"><img class="icon" src="{{url_for('static', filename='icons/si-glyph-edit.svg')}}" /></a></td>
+								<td>
+									<form action="{{url_for('admin.admin_delete', user_id=admin.id)}}" method="POST">
+										<input class="icon" type="image" name="submit" src="{{url_for('static', filename='icons/si-glyph-delete.svg')}}">
+									</form>
+								</td>
+							</tr>
+						{% endfor %}
+					</table>
+				</div>
+			</div>
+		</div>
+		<div class="col-md">
+			<div id="member-section">
+				<h2 class="section-header">Members</h2>
+				<span class="section-add">
+					<a href="{{url_for('admin.member_new')}}"><img class="icon" src="{{url_for('static', filename='icons/si-glyph-plus.svg')}}" ></a>
+				</span>
+				<hr>
+				<div class="data-section">
+					<table>
+						<tr>
+							<th>ID</th>
+							<th>First Name</th>
+							<th>Last Name</th>
+							<th>Email</th>
+							<th>Edit</th>
+							<th>Delete</th>
+						</tr>
+						{% for member in members %}
+							<tr>
+								<td><strong>{{member.id}}</strong></td>
+								<td>{{member.first_name}}</td>
+								<td>{{member.last_name}}</td>
+								<td>{{member.email}}</td>
+								<td><a href="{{url_for('admin.member_edit', member_id=member.id)}}"><img class="icon" src="{{url_for('static', filename='icons/si-glyph-edit.svg')}}" /></a></td>
+								<td>
+									<form action="{{url_for('admin.member_delete', member_id=member.id)}}" method="POST">
+										<input class="icon" type="image" name="submit" src="{{url_for('static', filename='icons/si-glyph-delete.svg')}}">
+									</form>
+								</td>
+							</tr>
+						{% endfor %}
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md">
+			<div id="suggestion-section">
+				<h2 class="section-header">Suggestions</h2>
+				<span class="section-add">
+					<a href="{{url_for('main.suggestions')}}"><img class="icon" src="{{url_for('static', filename='icons/si-glyph-plus.svg')}}" ></a>
+				</span>
+				<hr>
+				<div class="data-section">
+					<table>
+						<tr>
+							<th>ID</th>
+							<th>First Name</th>
+							<th>Last Name</th>
+							<th>Title</th>
+							<th>Edit</th>
+							<th>Delete</th>
+						</tr>
+						{% for suggestion in suggestions %}
+							<tr>
+								<td><strong>{{suggestion.id}}</strong></td>
+								<td>{{suggestion.first_name}}</td>
+								<td>{{suggestion.last_name}}</td>
+								<td>{{suggestion.title}}</td>
+								<td><a href="{{url_for('main.suggestions_edit', suggestion_id=suggestion.id)}}"><img class="icon" src="{{url_for('static', filename='icons/si-glyph-edit.svg')}}" /></a></td>
+								<td>
+									<form action="{{url_for('main.suggestions_delete', suggestion_id=suggestion.id)}}" method="POST">
+										<input class="icon" type="image" name="submit" src="{{url_for('static', filename='icons/si-glyph-delete.svg')}}">
+									</form>
+								</td>
+							</tr>
+						{% endfor %}
+					</table>
+				</div>
+			</div>
 		</div>
 	</div>
 {% endblock %}

@@ -26,5 +26,4 @@ class User(db.Model):
 	
 	@staticmethod
 	def exists_id(id):
-		user = User.query.filter_by(id=id).first()
-		return user
+		return User.query.filter_by(id=id).first()

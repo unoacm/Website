@@ -6,7 +6,14 @@
 	<div class="container">
 		{{ utils.flashes() }}
 		<div class="form-header">
-			<h1>Create an Admin</h1>
+			<h1>
+				{% if type == 'new' %}
+					Create 
+				{% elif type == 'edit' %}
+					Edit 
+				{% endif %}
+				Admin
+			</h1>
 			{{utils.make_form(form)}}
 		</div>
 	</div>
