@@ -2,22 +2,14 @@ html, body
 {
 	height:100%;
     width:100%;
-    border:0px;
+    border:0;
     margin:0;
-    padding:0;
+	padding:0;
 }
 
 #content
 {
 	margin-top: 40px;
-}
-
-#uno_logo
-{
-	width: 150px;
-	height: 50px;
-	margin-left: 10px;
-	
 }
 
 footer
@@ -30,16 +22,19 @@ footer
 	width: 100%;
 }
 
-#copyright
+#uno_logo
 {
-	margin: 0 33%;
-	display: inline-block;
+	width: 150px;
+	height: 50px;
+	margin-left: 10px;
 }
 
-#inner_footer
+#copyright
 {
-	margin: 0;
-	padding: 0;
+	display: inline-block;
+	position: absolute;
+	left: 45%;
+	top: 40%;
 }
 
 #navigation_section, footer
@@ -49,5 +44,11 @@ footer
 
 .login
 {
-	margin-left: 31%;
+	margin-top: 50px;
+}
+
+.login-header
+{
+	position: absolute;
+	left: 43%;
 }

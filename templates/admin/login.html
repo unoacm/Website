@@ -2,15 +2,18 @@
 {% block title %}Admin Login{% endblock %}
 {% block content %}
 <div class="container">
-	<form class="login" action="" method="post">
-		{{ form.csrf_token() }}
+	<div class="login-header">
+		<h1>Admin Login</h1>
+		<form class="login" action="" method="post">
+			{{ form.csrf_token() }}
 
-		{% for field in form if field.name != "csrf_token" %}
-			{% if field.name != "submit" %}
-				<p>{{ field.label() }}</p>
-			{% endif %}
-			<p>{{ field }}</p>
-		{% endfor %}
-	</form>
+			{% for field in form if field.name != "csrf_token" %}
+				{% if field.name != "submit" %}
+					<p>{{ field.label() }}</p>
+				{% endif %}
+				<p>{{ field }}</p>
+			{% endfor %}
+		</form>
+	</div>
 </div>
 {% endblock %}
