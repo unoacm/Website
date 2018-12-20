@@ -1,5 +1,5 @@
 from flask import (
-	Blueprint, render_template, redirect, url_for, session
+	Blueprint, render_template, redirect, url_for, session, flash
 )
 from wtforms import (
 	StringField, SubmitField, PasswordField
@@ -39,6 +39,7 @@ def login():
 		password = loginForm.password.data
 		if authentication.login(username, password, admin_models.User, 'admin'):
 			return redirect(url_for('admin.index'))
+		flash('Invalid Credentials', 'danger')
 	
 	return render_template('admin/login.html', form=loginForm)
 

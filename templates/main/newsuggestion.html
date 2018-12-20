@@ -1,0 +1,13 @@
+{% extends 'main/base.html' %}
+{% import 'main/utils.html' as utils %}
+{% block title %}Suggestions Box{% endblock %}
+{% block suggestions_active %}active{% endblock %}
+{% block content %}
+<div class="container">
+	{{ utils.flashes() }}
+	<div class="login-header">
+		<h1>Give a Suggestion</h1>
+		{{ utils.make_form(form) }}
+	</div>
+</div>
+{% endblock %}

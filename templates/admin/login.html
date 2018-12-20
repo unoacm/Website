@@ -1,19 +1,12 @@
 {% extends "main/base.html" %}
+{% import "main/utils.html" as utils %}
 {% block title %}Admin Login{% endblock %}
 {% block content %}
 <div class="container">
+	{{ utils.flashes() }}
 	<div class="login-header">
 		<h1>Admin Login</h1>
-		<form class="login" action="" method="post">
-			{{ form.csrf_token() }}
-
-			{% for field in form if field.name != "csrf_token" %}
-				{% if field.name != "submit" %}
-					<p>{{ field.label() }}</p>
-				{% endif %}
-				<p>{{ field }}</p>
-			{% endfor %}
-		</form>
+		{{ utils.make_form(form) }}
 	</div>
 </div>
 {% endblock %}
