@@ -1,0 +1,13 @@
+{% extends 'admin/base.html' %}
+{% import 'main/utils.html' as utils %}
+{% block dashboard_active %}active{% endblock %}
+{% block content %}
+	{{super()}}
+	<div class="container">
+		{{ utils.flashes() }}
+		<div class="form-header">
+			<h1>Create an Admin</h1>
+			{{utils.make_form(form)}}
+		</div>
+	</div>
+{% endblock %}

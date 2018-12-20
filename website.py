@@ -22,7 +22,4 @@ app.register_blueprint(blog.blueprint)
 app.register_blueprint(admin.blueprint)
 
 if __name__ == "__main__":
-	# admin = admin_models.User('admin', 'pass')
-	# db.session.add(admin)
-	# db.session.commit()
 	app.run()

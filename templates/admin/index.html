@@ -1,3 +1,34 @@
-{% extends "main/base.html" %}
-{% block title %}Admin Page{% endblock %}
-{% block admin_active %}active{% endblock %}
+{% extends 'admin/base.html' %}
+{% block dashboard_active %}active{% endblock %}
+{% block content %}
+	{{super()}}
+	<div id="admin-section">
+		<h2 class="section-header">Admins</h2>
+		<span class="section-add">
+			<a href="{{url_for('admin.admin_new')}}"><img class="icon" src="{{url_for('static', filename='icons/si-glyph-plus.svg')}}" ></a>
+		</span>
+		<hr>
+		<div class="data-section">
+			<table>
+				<tr>
+					<th>ID</th>
+					<th>Username</th>
+					<th>Edit</th>
+					<th>Delete</th>
+				</tr>
+				{% for admin in admins %}
+					<tr>
+						<td><strong>{{admin.id}}</strong></td>
+						<td>{{admin.username}}</td>
+						<td><a href="{{url_for('admin.admin_edit', user_id=admin.id)}}"><img class="icon" src="{{url_for('static', filename='icons/si-glyph-edit.svg')}}" /></a></td>
+						<td>
+							<form action="{{url_for('admin.admin_delete', user_id=admin.id)}}" method="POST">
+								<input class="icon" type="image" name="submit" src="{{url_for('static', filename='icons/si-glyph-delete.svg')}}">
+							</form>
+						</td>
+					</tr>
+				{% endfor %}
+			</table>
+		</div>
+	</div>
+{% endblock %}

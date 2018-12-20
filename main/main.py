@@ -46,7 +46,7 @@ def suggestions():
 		db.session.commit()
 		flash('Successfully submitted', 'success')
 		return redirect(url_for('main.suggestions'))
-	return render_template('main/newsuggestion.html', form=suggestionForm)
+	return render_template('main/suggestion-new.html', form=suggestionForm)
 
 @blueprint.route('documents')
 def documents():

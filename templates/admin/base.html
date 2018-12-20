@@ -1,0 +1,13 @@
+{% extends "main/base.html" %}
+{% block title %}Admin Page{% endblock %}
+{% block admin_active %}active{% endblock %}
+{% block content %}
+	<nav class="nav nav-pills nav-fill" id="admin-nav">
+		<a class="nav-item nav-link {% block dashboard_active %}{% endblock %}" href="{{url_for('admin.index')}}">Admin Dashboard</a>
+		<a class="nav-item nav-link {% block members_active %}{% endblock %} disabled" href="#">Members</a>
+		<a class="nav-item nav-link {% block suggestions_active %}{% endblock %} disabled" href="#">Suggestions</a>
+		<a class="nav-item nav-link {% block events_active %}{% endblock %} disabled" href="#">Events</a>
+		<a class="nav-item nav-link {% block blog_active %}{% endblock %} disabled" href="#">Blog</a>
+		<a class="nav-item nav-link {% block documents_active %}{% endblock %} disabled" href="#">Documents</a>
+	</nav>
+{% endblock %}

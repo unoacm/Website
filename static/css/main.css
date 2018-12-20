@@ -44,16 +44,59 @@ footer
 
 .form-body
 {
-	margin-top: 50px;
+	margin-top: 40px;
 }
 
-.login-header
+.form-header
 {
 	position: absolute;
 	left: 43%;
+	margin-top: 45px;
 }
 
 .flashes
 {
 	list-style: none;
+}
+
+#admin-section
+{
+	width: 30%;
+	margin: 30px;
+	border: 1px solid #DEDEDE
+}
+
+.section-header
+{
+	display: inline-block;
+	vertical-align: sub;
+	margin-left: 35%;
+	margin-top: 15px;
+	margin-bottom: 0px;
+}
+
+.section-add
+{
+	float: right;
+	margin-top: 22px;
+	margin-right: 10px;
+}
+
+table
+{
+	margin-left: 10px;
+	width: 100%;
+}
+
+.data-section
+{
+	overflow: hidden;
+	text-align: center;
+	margin-bottom: 10px;
+}
+
+.icon
+{
+	width: 20px;
+	height: auto;
 }
