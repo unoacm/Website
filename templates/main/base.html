@@ -24,6 +24,10 @@
 				<a class="nav-item nav-link {% block blog_active %}{% endblock %}" href="{{url_for('blog.index')}}">Blog</a>
 				<a class="nav-item nav-link {% block suggestions_active %}{% endblock %}" href="{{url_for('main.suggestions')}}">Suggestions</a>
 				<a class="nav-item nav-link {% block documents_active %}{% endblock %}" href="{{url_for('main.documents')}}">Documents</a>
+				{% if session.get('admin') != None %}
+					<a class="nav-item nav-link {% block admin_active %}{% endblock %}" href="{{url_for('admin.index')}}">Admin Dashboard</a>
+					<a class="nav-item nav-link" href="{{url_for('admin.logout')}}">Sign Out</a>
+				{% endif %}
 			</div>
 			</div>
 		</nav>

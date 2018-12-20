@@ -9,13 +9,7 @@ html, body
 
 #content
 {
-	margin-top: 20px;
-}
-
-#calendar
-{
-	margin: 0 auto;
-	width: 45%;
+	margin-top: 40px;
 }
 
 #uno_logo
@@ -51,4 +45,9 @@ footer
 #navigation_section, footer
 {
 	background-color: rgba(1, 130, 172, .3); /* ACM blue */
+}
+
+.login
+{
+	margin-left: 31%;
 }

@@ -2,7 +2,7 @@
 {% block title %}Admin Login{% endblock %}
 {% block content %}
 <div class="container">
-	<form action="" method="post">
+	<form class="login" action="" method="post">
 		{{ form.csrf_token() }}
 
 		{% for field in form if field.name != "csrf_token" %}
