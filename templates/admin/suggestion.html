@@ -1,0 +1,27 @@
+{% extends 'admin/base.html' %}
+{% block suggestion_active %}active{% endblock %}
+{% block content %}
+	{{super()}}
+	<div class="container border">
+		<div class="text-center">
+			<h1>{{data.title}}</h1>
+			<small>
+				{% if not data.first_nameNone and not data.last_name %}
+					Anonymous
+				{% endif %}
+				{% if data.first_name %}
+					{{data.first_name}} 
+				{% endif %}
+				{% if data.last_name %}
+					{{data.last_name}}
+				{% endif %}
+			</small>
+			<hr>
+			<p>{{data.description}}</p>
+		</div>
+		<small>{{data.date}}</small>
+		<form action="{{data.getDeleteRoute()}}" method="POST">
+			<button class="delete-confirm btn btn-danger btn-sm" name="submit" type="button">Delete</button>
+		</form>
+	</div>
+{% endblock %}

@@ -1,7 +1,8 @@
 from flask_sqlalchemy import SQLAlchemy
 from database.sqldb import db as db
 import auth.auth as authentication
-from flask_wtf import FlaskForm
+from utils.forms import RedirectForm
+import utils.utils as utils
 from werkzeug.security import (
 	check_password_hash, generate_password_hash
 )
@@ -15,12 +16,12 @@ from wtforms.validators import (
 	DataRequired
 )
 
-class AdminCreateForm(FlaskForm):
+class AdminCreateForm(RedirectForm):
 	username = StringField("Username: ", validators=[DataRequired()])
 	password = PasswordField("Password: ", validators=[DataRequired()])
 	submit = SubmitField("Create")
 
-class AdminEditForm(FlaskForm):
+class AdminEditForm(RedirectForm):
 	username = StringField("Username: ", validators=[DataRequired()])
 	password = PasswordField("Password: ")
 	submit = SubmitField("Create")
@@ -76,7 +77,7 @@ def admin_new():
 		password = createForm.password.data
 		if User.exists(username, password) != None:
 			flash('Admin user already exists', 'danger')
-			return redirect(url_for('admin.admin_new'))
+			return createForm.redirect(url_for('admin.admin_new'))
 
 		newAdmin = User(username=username, password=password)
 		db.session.add(newAdmin)
@@ -105,7 +106,7 @@ def admin_edit(user_id):
 		if password != "":
 			editingUser.password = generate_password_hash(password)
 		db.session.commit()
-		return redirect(url_for('admin.index'))
+		return createForm.redirect(url_for('admin.index'))
 
 	createForm.username.data = editingUser.username
 	return render_template('models/admin-form.html', form=createForm, type='edit')
@@ -119,4 +120,4 @@ def admin_delete(user_id):
 		return redirect(url_for('admin.index'))
 	User.query.filter_by(id=user_id).delete()
 	db.session.commit()
-	return redirect(url_for('admin.index'))
+	return redirect(utils.get_redirect_url() or url_for('admin.index'))

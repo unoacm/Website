@@ -9,9 +9,11 @@ from wtforms.validators import (
 )
 import auth.auth as authentication
 from database.sqldb import db as db
-from flask_wtf import FlaskForm
+from utils.forms import RedirectForm
+import utils.utils as utils
+import datetime
 
-class SuggestionForm(FlaskForm):
+class SuggestionForm(RedirectForm):
 	first_name = StringField("First Name: ")
 	last_name = StringField("Last Name: ")
 	title = StringField("Title: ", validators=[DataRequired()])
@@ -24,12 +26,14 @@ class Suggestion(db.Model):
 	last_name = db.Column(db.String(30))
 	title = db.Column(db.String(30), nullable=False)
 	description = db.Column(db.String(500), nullable=False)
+	date = db.Column(db.Date(), nullable=False)
 
 	def __init__(self, title, description, first_name=None, last_name=None):
 		self.first_name = first_name
 		self.last_name = last_name
 		self.title = title
 		self.description = description
+		self.date = datetime.datetime.today()
 
 	@staticmethod
 	def __dir__():
@@ -66,8 +70,8 @@ def suggestion_new():
 		suggestion = Suggestion(first_name=first_name, last_name=last_name, title=title, description=description)
 		db.session.add(suggestion)
 		db.session.commit()
-		flash('Successfully submitted', 'success')
-		return redirect(url_for('suggestion.suggestion_new'))
+		flash('Suggestion successfully submitted', 'success')
+		return suggestionForm.redirect(url_for('suggestion.suggestion_new'))
 	return render_template('models/suggestion-form.html', form=suggestionForm, type='new')
 
 @blueprint.route('<int:suggestion_id>/edit', methods=['GET', 'POST'])
@@ -76,7 +80,7 @@ def suggestion_edit(suggestion_id):
 		return redirect(url_for('admin.login'))
 	editingSuggestion = Suggestion.exists_id(suggestion_id)
 	if editingSuggestion == None:
-		return redirect(url_for('admin.index'))
+		return utils.redirect('admin.index')
 	
 	suggestionForm = SuggestionForm()
 	if suggestionForm.validate_on_submit():
@@ -85,7 +89,7 @@ def suggestion_edit(suggestion_id):
 		editingSuggestion.title = suggestionForm.title.data
 		editingSuggestion.description = suggestionForm.description.data
 		db.session.commit()
-		return redirect(url_for('admin.index'))
+		return suggestionForm.redirect(url_for('admin.index'))
 	
 	suggestionForm.first_name.data = editingSuggestion.first_name
 	suggestionForm.last_name.data = editingSuggestion.last_name
@@ -102,4 +106,4 @@ def suggestion_delete(suggestion_id):
 		return redirect(url_for('admin.index'))
 	Suggestion.query.filter_by(id=suggestion_id).delete()
 	db.session.commit()
-	return redirect(url_for('admin.index'))
+	return redirect(utils.get_redirect_url() or url_for('admin.index'))

@@ -5,21 +5,16 @@ html, body
     border:0;
     margin:0;
 	padding:0;
+	position: relative;
+	min-height: 100%;
+	overflow-x: hidden;
 }
 
 #content
 {
 	margin-top: 40px;
-}
-
-footer
-{
-	margin-top: 40px;
-	padding-bottom: 10px;
-	position: fixed;
-	left: 0;
-	bottom: 0;
-	width: 100%;
+	padding-bottom: 2.5em;
+	min-height: 70%;
 }
 
 #uno_logo
@@ -29,18 +24,29 @@ footer
 	margin-left: 10px;
 }
 
-#copyright
-{
-	display: inline-block;
-	position: absolute;
-	left: 45%;
-	top: 40%;
-}
-
 #navigation_section, footer
 {
 	background-color: rgba(1, 130, 172, .3); /* ACM blue */
 }
+
+#copyright
+{
+	margin-top: 10px;
+}
+
+.push
+{
+	margin-top: 10%;
+}
+
+.footer {
+	position: absolute;
+	right: 0;
+	bottom: -1;
+	left: 0;
+	padding: 1rem;
+	height: 10%;
+  }
 
 .form-body
 {
@@ -59,26 +65,29 @@ footer
 	list-style: none;
 }
 
-#admin-section, #member-section, #suggestion-section
+#admin-nav
 {
-	margin-top: 30px;
-	margin-left: 10px;
-	margin-right: 10px;
-	border: 1px solid #DEDEDE;
+	margin-bottom: 30px;
 }
 
 .section
 {
-	margin-top: 30px;
+	margin-top: 20px;
 	margin-left: 10px;
 	margin-right: 10px;
-	border: 1px solid #DEDEDE;
+	overflow: auto;
+	max-height: 350px;
 }
 
 .section-header
 {
 	margin-top: 10px;
 	margin-bottom: 0px;
+}
+
+.section-add
+{
+	margin-left: 20px;
 }
 
 table
@@ -98,4 +107,15 @@ table
 {
 	width: 20px;
 	height: auto;
+}
+
+.list-group-item
+{
+	margin-top: 10px;
+}
+
+.delete-confirm
+{
+	text-decoration: none;
+	border: none;
 }

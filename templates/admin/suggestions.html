@@ -1,0 +1,37 @@
+{% extends 'admin/base.html' %}
+{% block suggestion_active %}active{% endblock %}
+{% block content %}
+	{{super()}}
+	<h1 class="text-center">Suggestions</h1>
+	<hr>
+	<div class="container">
+		<div class="list-group">
+			{% for suggestion in data %}
+				<a href="{{url_for('admin.suggestion', suggestion_id=suggestion.id)}}" class="shadow-sm list-group-item list-group-item-action flex-column align-items-start">
+					<div class="d-flex w-100 justify-content-between">
+						<h5 class="mb-1">{{suggestion.title}}</h5>
+						<small>{{suggestion.date}}</small>
+					</div>
+					<p class="mb-1">
+						{{suggestion.description}}
+					</p>
+					<small>
+						{% if not suggestion.first_nameNone and not suggestion.last_name %}
+							Anonymous
+						{% endif %}
+						{% if suggestion.first_name %}
+							{{suggestion.first_name}} 
+						{% endif %}
+						{% if suggestion.last_name %}
+							{{suggestion.last_name}}
+						{% endif %}
+					</small>
+				</a>
+			{% endfor %}
+		</div>
+	</div>
+{% endblock %}
+{% block footer %}
+	{{super()}}
+	<script src="{{url_for('static', filename='js/suggestions.js')}}"></script>
+{% endblock %}

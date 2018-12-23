@@ -1,7 +1,8 @@
 from flask_sqlalchemy import SQLAlchemy
 from database.sqldb import db as db
-from flask_wtf import FlaskForm
+from utils.forms import RedirectForm
 import auth.auth as authentication
+import utils.utils as utils
 from wtforms import (
 	StringField, SubmitField, PasswordField
 )
@@ -12,7 +13,7 @@ from flask import (
 	Blueprint, render_template, redirect, url_for, session, flash, 
 )
 
-class MemberCreateForm(FlaskForm):
+class MemberCreateForm(RedirectForm):
 	first_name = StringField("First Name: ", validators=[DataRequired()])
 	last_name = StringField("Last Name: ", validators=[DataRequired()])
 	email = StringField("Email: ")
@@ -66,7 +67,7 @@ def member_new():
 		newMember = Member(first_name=first_name, last_name=last_name, email=email)
 		db.session.add(newMember)
 		db.session.commit()
-		return redirect(url_for('admin.index'))
+		return memberForm.redirect(url_for('admin.index'))
 	
 	return render_template('models/member-form.html', form=memberForm, type='new')
 
@@ -90,7 +91,7 @@ def member_edit(member_id):
 		editingMember.last_name = last_name
 		editingMember.email = email
 		db.session.commit()
-		return redirect(url_for('admin.index'))
+		return memberForm.redirect('admin.index')
 
 	memberForm.first_name.data = editingMember.first_name
 	memberForm.last_name.data = editingMember.last_name

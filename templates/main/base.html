@@ -37,14 +37,21 @@
 		{% block content %}
 		{% endblock %}
 	</div>
+	<div class="push"></div>
 	<div id="footer">
 		{% block footer %}
-		<footer class="pt-4">
-			<a href="https://www.unomaha.edu/">
-				<img id="uno_logo" src="{{url_for('static', filename='images/UNO_Logo.png')}}" alt="UNO Logo" />
-			</a>
-			<div id="copyright">
-				<p>© 2018 Copyright: UNO ACM College Chapter</p>
+		<footer class="footer pt-4 font-small">
+			<div class="row">
+				<div class="col-md-5">
+					<a href="https://www.unomaha.edu/">
+						<img id="uno_logo" src="{{url_for('static', filename='images/UNO_Logo.png')}}" alt="UNO Logo" />
+					</a>
+				</div>
+				<div class="col-md-7">
+					<div id="copyright">
+						© 2018 Copyright: UNO ACM College Chapter
+					</div>
+				</div>
 			</div>
 		</footer>
 		<script src="{{url_for('static', filename='js/jquery-3.3.1.min.js')}}"></script>

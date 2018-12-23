@@ -1,63 +1,21 @@
 {% extends 'admin/base.html' %}
 {% block dashboard_active %}active{% endblock %}
+{% import "main/utils.html" as utils %}
 {% block content %}
 	{{super()}}
+	{{utils.flashes()}}
 	<div class="row">
 			{% for header, class, disabled_fields, objs in data %}
 				{% if loop.index != 0 and loop.index % 3 == 0 %}
 					<div class="w-100"></div>
 				{% endif %}
 				<div class="col-md">
-					<div class="section">
-						<h2 class="section-header text-center">{{header}}</h2>
-						<div class="section-add">
-							<a href="{{class.getNewRoute()}}"><img class="icon float-right" src="{{url_for('static', filename='icons/si-glyph-plus.svg')}}" ></a>
-						</div>
-						<hr>
-						<div class="data-section">
-							<table>
-								<tr>
-									{% for name in class.__dir__() %}
-										{% if name is not in disabled_fields %}
-											<th>
-												{{name.strip().replace('_', ' ').title()}}
-											</th>
-										{% endif %}
-									{% endfor %}
-									<th>Edit</th>
-									<th>Delete</th>
-								</tr>
-								{% for obj in objs %}
-									<tr>
-										{% for name in class.__dir__() %}
-											{% if name is not in disabled_fields %}
-												<td>
-													{% if name == 'id' %}
-														<strong>
-													{% endif %}
-													{{obj[name]}}
-													{% if name == 'id' %}
-														</strong>
-													{% endif %}
-												</td>
-											{% endif %}
-										{% endfor %}
-										<td><a href="{{obj.getEditRoute()}}"><img class="icon" src="{{url_for('static', filename='icons/si-glyph-edit.svg')}}" /></a></td>
-										<td>
-											<form action="{{obj.getDeleteRoute()}}" method="POST">
-												<input class="icon delete-confirm" type="image" name="submit" src="{{url_for('static', filename='icons/si-glyph-delete.svg')}}">
-											</form>
-										</td>
-									</tr>
-								{% endfor %}
-							</table>
-						</div>
-					</div>
+					{{utils.make_model_table(header, class, disabled_fields, objs)}}
 				</div>
 			{% endfor %}
 		</div>
 {% endblock %}
 {% block footer %}
 	{{super()}}
-	<script src="{{url_for('static', filename='js/main.js')}}"></script>
+	<script src="{{url_for('static', filename='js/deleteLinks.js')}}"></script>
 {% endblock %}

@@ -10,15 +10,16 @@ from wtforms.validators import (
 from werkzeug.security import (
 	generate_password_hash
 )
-from flask_wtf import FlaskForm
+from utils.forms import RedirectForm
 from database.sqldb import db as db
 import database.sqldb as sqldb
 import auth.auth as authentication
 import database.models.admin as admin_models
 import database.models.suggestion as suggestion_models
 import database.models.member as member_models
+import utils.utils as utils
 
-class AdminLoginForm(FlaskForm):
+class AdminLoginForm(RedirectForm):
 	username = StringField("Username: ", validators=[DataRequired()])
 	password = PasswordField("Password: ", validators=[DataRequired()])
 	submit = SubmitField("Login")
@@ -38,6 +39,30 @@ def index():
 		["Suggestions", suggestion_models.Suggestion, ['description'], suggestions]
 	]
 	return render_template('admin/index.html', data=data)
+
+@blueprint.route('/members')
+def members():
+	if not authentication.isLoggedIn('admin'):
+		return redirect(url_for('admin.login'))
+	members = member_models.Member.query.all()
+	return render_template('admin/members.html', classType=member_models.Member, disabled_fields=[], data=members)
+
+@blueprint.route('/suggestions')
+def suggestions():
+	if not authentication.isLoggedIn('admin'):
+		return redirect(url_for('admin.login'))
+	suggestions = suggestion_models.Suggestion.query.all()
+	return render_template('admin/suggestions.html', data=suggestions)
+
+@blueprint.route('/suggestions/<int:suggestion_id>')
+def suggestion(suggestion_id):
+	if not authentication.isLoggedIn('admin'):
+		return redirect(url_for('admin.login'))
+	currentSuggestion = suggestion_models.Suggestion.exists_id(suggestion_id)
+	if currentSuggestion == None:
+		return redirect(url_for('admin.suggestions'))
+	
+	return render_template('admin/suggestion.html', data=currentSuggestion)
 
 @blueprint.route('/login', methods=['GET', 'POST'])
 def login():

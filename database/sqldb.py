@@ -10,4 +10,3 @@ def getAttributeNames(model):
 
 def getTitlesWithAttributes(model):
 	return [(attr.replace('_', ' ').strip().title(), attr) for attr in model.__dir__()]
-
