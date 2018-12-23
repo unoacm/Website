@@ -22,7 +22,7 @@
 				<a class="nav-item nav-link {% block about_active %}{% endblock %}" href="{{url_for('main.about')}}">About us</a>
 				<a class="nav-item nav-link {% block events_active %}{% endblock %}" href="{{url_for('main.events')}}">Events</a>
 				<a class="nav-item nav-link {% block blog_active %}{% endblock %}" href="{{url_for('blog.index')}}">Blog</a>
-				<a class="nav-item nav-link {% block suggestions_active %}{% endblock %}" href="{{url_for('main.suggestions')}}">Give a Suggestion</a>
+				<a class="nav-item nav-link {% block suggestions_active %}{% endblock %}" href="{{url_for('suggestion.suggestion_new')}}">Give a Suggestion</a>
 				<a class="nav-item nav-link {% block documents_active %}{% endblock %}" href="{{url_for('main.documents')}}">Documents</a>
 				{% if session.get('admin') != None %}
 					<a class="nav-item nav-link {% block admin_active %}{% endblock %}" href="{{url_for('admin.index')}}">Admin Dashboard</a>

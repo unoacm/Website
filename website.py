@@ -7,7 +7,9 @@ from database.sqldb import db as db
 import main.main as main
 import blog.blog as blog
 import admin.admin as admin
-import database.admin as admin_models
+import database.models.admin as admin_models
+import database.models.member as member_models
+import database.models.suggestion as suggestion_models
 
 app = Flask(__name__)
 app.app_context().push()
@@ -20,6 +22,10 @@ db.create_all()
 app.register_blueprint(main.blueprint)
 app.register_blueprint(blog.blueprint)
 app.register_blueprint(admin.blueprint)
+
+app.register_blueprint(admin_models.blueprint)
+app.register_blueprint(member_models.blueprint)
+app.register_blueprint(suggestion_models.blueprint)
 
 if __name__ == "__main__":
 	app.run()
