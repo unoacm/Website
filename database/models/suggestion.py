@@ -91,7 +91,7 @@ def suggestion_edit(suggestion_id):
 	suggestionForm.last_name.data = editingSuggestion.last_name
 	suggestionForm.title.data = editingSuggestion.title
 	suggestionForm.description.data = editingSuggestion.description
-	return render_template('main/suggestion-form.html', form=suggestionForm)
+	return render_template('models/suggestion-form.html', form=suggestionForm)
 
 @blueprint.route('<int:suggestion_id>/delete', methods=['POST'])
 def suggestion_delete(suggestion_id):
