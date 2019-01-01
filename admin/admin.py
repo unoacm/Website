@@ -28,7 +28,7 @@ blueprint = Blueprint('admin', __name__, url_prefix='/admin')
 
 @blueprint.route('/')
 def index():
-	if not authentication.isLoggedIn('admin'):
+	if not authentication.isLoggedIn(authentication.ADMIN):
 		return redirect(url_for('admin.login'))
 	admins = admin_models.User.query.all()
 	members = member_models.Member.query.all()
@@ -42,21 +42,21 @@ def index():
 
 @blueprint.route('/members')
 def members():
-	if not authentication.isLoggedIn('admin'):
+	if not authentication.isLoggedIn(authentication.ADMIN):
 		return redirect(url_for('admin.login'))
 	members = member_models.Member.query.all()
 	return render_template('admin/members.html', classType=member_models.Member, disabled_fields=[], data=members)
 
 @blueprint.route('/suggestions')
 def suggestions():
-	if not authentication.isLoggedIn('admin'):
+	if not authentication.isLoggedIn(authentication.ADMIN):
 		return redirect(url_for('admin.login'))
 	suggestions = suggestion_models.Suggestion.query.all()
 	return render_template('admin/suggestions.html', data=suggestions)
 
 @blueprint.route('/suggestions/<int:suggestion_id>')
 def suggestion(suggestion_id):
-	if not authentication.isLoggedIn('admin'):
+	if not authentication.isLoggedIn(authentication.ADMIN):
 		return redirect(url_for('admin.login'))
 	currentSuggestion = suggestion_models.Suggestion.exists_id(suggestion_id)
 	if currentSuggestion == None:
@@ -66,14 +66,14 @@ def suggestion(suggestion_id):
 
 @blueprint.route('/login', methods=['GET', 'POST'])
 def login():
-	if authentication.isLoggedIn('admin'):
+	if authentication.isLoggedIn(authentication.ADMIN):
 		return redirect(url_for('admin.index'))
 
 	loginForm = AdminLoginForm()
 	if loginForm.validate_on_submit():
 		username = loginForm.username.data
 		password = loginForm.password.data
-		if authentication.login(username, password, admin_models.User, 'admin'):
+		if authentication.login(username, password, admin_models.User, authentication.ADMIN):
 			return redirect(url_for('admin.index'))
 		flash('Invalid Credentials', 'danger')
 	

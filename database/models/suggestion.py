@@ -78,7 +78,7 @@ def suggestion_new():
 
 @blueprint.route('<int:suggestion_id>/edit', methods=['GET', 'POST'])
 def suggestion_edit(suggestion_id):
-	if not authentication.isLoggedIn('admin'):
+	if not authentication.isLoggedIn(authentication.ADMIN):
 		return redirect(url_for('admin.login'))
 	editingSuggestion = Suggestion.exists_id(suggestion_id)
 	if editingSuggestion == None:
@@ -101,7 +101,7 @@ def suggestion_edit(suggestion_id):
 
 @blueprint.route('<int:suggestion_id>/delete', methods=['POST'])
 def suggestion_delete(suggestion_id):
-	if not authentication.isLoggedIn('admin'):
+	if not authentication.isLoggedIn(authentication.ADMIN):
 		return redirect(url_for('admin.login'))
 	editingSuggestion = Suggestion.exists_id(suggestion_id)
 	if editingSuggestion == None:

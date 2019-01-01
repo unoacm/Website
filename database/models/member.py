@@ -52,7 +52,7 @@ blueprint = Blueprint('member', __name__, url_prefix='/member')
 
 @blueprint.route('/new', methods=['GET', 'POST'])
 def member_new():
-	if not authentication.isLoggedIn('admin'):
+	if not authentication.isLoggedIn(authentication.ADMIN):
 		return redirect(url_for('admin.login'))
 	
 	memberForm = MemberCreateForm()
@@ -73,7 +73,7 @@ def member_new():
 
 @blueprint.route('<int:member_id>/edit', methods=['GET', 'POST'])
 def member_edit(member_id):
-	if not authentication.isLoggedIn('admin'):
+	if not authentication.isLoggedIn(authentication.ADMIN):
 		return redirect(url_for('admin.login'))
 	editingMember = Member.exists_id(member_id)
 	if editingMember == None:
@@ -100,7 +100,7 @@ def member_edit(member_id):
 
 @blueprint.route('<int:member_id>/delete', methods=['POST'])
 def member_delete(member_id):
-	if not authentication.isLoggedIn('admin'):
+	if not authentication.isLoggedIn(authentication.ADMIN):
 		return redirect(url_for('admin.login'))
 	editingMember = Member.exists_id(member_id)
 	if editingMember == None:
