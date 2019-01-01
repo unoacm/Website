@@ -14,9 +14,10 @@ from utils.forms import RedirectForm
 from database.sqldb import db as db
 import database.sqldb as sqldb
 import auth.auth as authentication
-import database.models.admin as admin_models
+import database.models.user as user_models
 import database.models.suggestion as suggestion_models
 import database.models.member as member_models
+import database.models.document as document_models
 import utils.utils as utils
 
 class AdminLoginForm(RedirectForm):
@@ -30,13 +31,15 @@ blueprint = Blueprint('admin', __name__, url_prefix='/admin')
 def index():
 	if not authentication.isLoggedIn(authentication.ADMIN):
 		return redirect(url_for('admin.login'))
-	admins = admin_models.User.query.all()
+	users = user_models.User.query.all()
 	members = member_models.Member.query.all()
 	suggestions = suggestion_models.Suggestion.query.all()
+	documents = document_models.Document.query.all()
 	data = [
-		["Admins", admin_models.User, ['password'], admins],
+		["Users", user_models.User, ['password'], users],
 		["Members", member_models.Member, [], members],
-		["Suggestions", suggestion_models.Suggestion, ['description'], suggestions]
+		["Suggestions", suggestion_models.Suggestion, ['description'], suggestions],
+		["Documents", document_models.Document, ['description'], documents]
 	]
 	return render_template('admin/index.html', data=data)
 
@@ -73,7 +76,7 @@ def login():
 	if loginForm.validate_on_submit():
 		username = loginForm.username.data
 		password = loginForm.password.data
-		if authentication.login(username, password, admin_models.User, authentication.ADMIN):
+		if authentication.login(username, password, authentication.ADMIN):
 			return redirect(url_for('admin.index'))
 		flash('Invalid Credentials', 'danger')
 	

@@ -70,7 +70,7 @@ def suggestion_new():
 		suggestion = Suggestion(first_name=first_name, last_name=last_name, title=title, description=description)
 		db.session.add(suggestion)
 		db.session.commit()
-		flash('Suggestion successfully submitted', 'success')
+		flash('Suggestion Submitted', 'success')
 		if authentication.isLoggedIn('admin'):
 			return suggestionForm.redirect(url_for('suggestion.suggestion_new'))
 		return redirect(url_for("suggestion.suggestion_new"))
@@ -91,6 +91,7 @@ def suggestion_edit(suggestion_id):
 		editingSuggestion.title = suggestionForm.title.data
 		editingSuggestion.description = suggestionForm.description.data
 		db.session.commit()
+		flash('Suggestion Edited', 'success')
 		return suggestionForm.redirect(url_for('admin.index'))
 	
 	suggestionForm.first_name.data = editingSuggestion.first_name
@@ -108,4 +109,5 @@ def suggestion_delete(suggestion_id):
 		return redirect(url_for('admin.index'))
 	Suggestion.query.filter_by(id=suggestion_id).delete()
 	db.session.commit()
+	flash('Suggestion Deleted', 'success')
 	return redirect(utils.get_redirect_url() or url_for('admin.index'))

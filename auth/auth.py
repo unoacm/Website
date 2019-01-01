@@ -1,13 +1,14 @@
 from flask import (
 	render_template, redirect, url_for, session
 )
-from enum import Enum
 
 ADMIN = 'admin'
 PUBLIC = 'public'
 
-def login(username, password, model, userType):
-	users = model.query.filter_by(username=username).all()
+import database.models.user as user_models
+
+def login(username, password, userType):
+	users = user_models.User.query.filter_by(username=username).all()
 	user = None
 	for u in users:
 		if u.check_password(password):

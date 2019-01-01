@@ -17,7 +17,7 @@ class MemberCreateForm(RedirectForm):
 	first_name = StringField("First Name: ", validators=[DataRequired()])
 	last_name = StringField("Last Name: ", validators=[DataRequired()])
 	email = StringField("Email: ")
-	submit = SubmitField("Create")
+	submit = SubmitField("Submit")
 
 class Member(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
@@ -67,6 +67,7 @@ def member_new():
 		newMember = Member(first_name=first_name, last_name=last_name, email=email)
 		db.session.add(newMember)
 		db.session.commit()
+		flash('Member Created', 'success')
 		return memberForm.redirect(url_for('admin.index'))
 	
 	return render_template('models/member-form.html', form=memberForm, type='new')
@@ -91,6 +92,7 @@ def member_edit(member_id):
 		editingMember.last_name = last_name
 		editingMember.email = email
 		db.session.commit()
+		flash('Member edited', 'success')
 		return memberForm.redirect('admin.index')
 
 	memberForm.first_name.data = editingMember.first_name
@@ -107,4 +109,5 @@ def member_delete(member_id):
 		return redirect(url_for('admin.index'))
 	Member.query.filter_by(id=member_id).delete()
 	db.session.commit()
+	flash('Member Deleted', 'success')
 	return redirect(url_for('admin.index'))
