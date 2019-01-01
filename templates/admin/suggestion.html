@@ -25,3 +25,7 @@
 		</form>
 	</div>
 {% endblock %}
+{% block footer %}
+	{{super()}}
+	<script src="{{url_for('static', filename='js/deleteLinks.js')}}"></script>
+{% endblock %}

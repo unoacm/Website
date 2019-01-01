@@ -71,7 +71,9 @@ def suggestion_new():
 		db.session.add(suggestion)
 		db.session.commit()
 		flash('Suggestion successfully submitted', 'success')
-		return suggestionForm.redirect(url_for('suggestion.suggestion_new'))
+		if authentication.isLoggedIn('admin'):
+			return suggestionForm.redirect(url_for('suggestion.suggestion_new'))
+		return redirect(url_for("suggestion.suggestion_new"))
 	return render_template('models/suggestion-form.html', form=suggestionForm, type='new')
 
 @blueprint.route('<int:suggestion_id>/edit', methods=['GET', 'POST'])
