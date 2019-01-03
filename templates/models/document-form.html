@@ -18,3 +18,7 @@
 		</div>
 	</div>
 {% endblock %}
+{% block footer %}
+{{super()}}
+<script src="{{url_for('static', filename='js/file.js')}}"></script>
+{% endblock %}

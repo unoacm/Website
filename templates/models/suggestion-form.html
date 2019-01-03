@@ -1,8 +1,14 @@
-{% extends 'main/base.html' %}
+{% if session['user'] and session['user'][0] == 'admin' %}
+	{% extends 'admin/base.html' %}
+{% else %}
+	{% extends 'main/base.html' %}
+{% endif %}
 {% import 'main/utils.html' as utils %}
 {% block title %}Suggestions Box{% endblock %}
 {% block suggestions_active %}active{% endblock %}
+{% block dashboard_active %}active{% endblock %}
 {% block content %}
+{{super()}}
 <div class="container">
 	{{ utils.flashes() }}
 	<div class="form-header">

@@ -22,7 +22,7 @@ class DocumentForm(RedirectForm):
 		choices = [(authentication.PUBLIC, 'Public'), (authentication.ADMIN, 'Admin')],
 		validators = [DataRequired()]
 	)
-	file = FileField(validators=[DataRequired()])
+	file = FileField("Choose File...", validators=[DataRequired()])
 	submit = SubmitField("Submit")
 
 class DocumentEditForm(DocumentForm):

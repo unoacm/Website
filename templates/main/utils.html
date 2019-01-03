@@ -21,14 +21,25 @@
 {%- endmacro  %}
 
 {%- macro make_form(wtform, action="", method="post") -%}
-		<form class="form-body" action="{{action}}" method="{{method}}" enctype="multipart/form-data">
+		<form class="form-body was-validated" action="{{action}}" method="{{method}}" enctype="multipart/form-data">
 			{{ wtform.csrf_token() }}
 
 			{% for field in wtform if field.name != "csrf_token" %}
-				{% if field.name != "submit" and field.name != "next" %}
-					<p>{{ field.label() }}</p>
+			<div class="form-group">
+					{% if field.name not in ["submit", "next", "file"] %}
+						{{ field.label() }}
 				{% endif %}
-				<p>{{ field }}</p>
+					{% if field.name == "submit" %}
+					{{ field(class_="btn btn-primary") }}
+					{% elif field.name == "file" %}
+						<div class="custom-file">
+							{{ field(class_="custom-file-input", id="validatedCustomFile") }}
+							{{ field.label(class_="custom-file-label") }}
+						</div>
+					{% else %}
+						{{ field(class_="form-control") }}
+					{% endif %}
+			</div>
 			{% endfor %}
 		</form>
 {%- endmacro %}

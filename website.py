@@ -19,7 +19,7 @@ app.app_context().push()
 app.instance_path = app.root_path
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database/test.db'
 app.config['SECRET_KEY'] = "Gotta make sure this key is super dang long, yeehaw!"
-app.config['DOCUMENT_PATH'] = os.path.join(app.instance_path, 'static', 'documents')
+app.config['DOCUMENT_PATH'] = os.path.join(app.instance_path, 'documents')
 
 db.init_app(app)
 db.create_all()
