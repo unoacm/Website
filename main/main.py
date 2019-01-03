@@ -1,15 +1,10 @@
 from flask import (
-	Blueprint, render_template, flash, redirect, url_for
-)
-from wtforms import (
-	StringField, SubmitField, TextAreaField
-)
-from wtforms.validators import (
-	DataRequired
+	Blueprint, render_template, session, url_for, redirect
 )
 from database.sqldb import db as db
-from flask_wtf import FlaskForm
+import database.models.document as document_models
 import auth.auth as authentication
+import math
 
 blueprint = Blueprint('main', __name__, url_prefix='/')
 
@@ -27,4 +22,23 @@ def events():
 
 @blueprint.route('documents')
 def documents():
-	return render_template('main/documents.html')
+	return redirect(url_for('main.documents_page', page=1))
+
+@blueprint.route('documents/<int:page>')
+def documents_page(page):
+	DOCUMENTS_PER_ROW = 3
+	MAX_DOCUMENT_PER_PAGE  = 9
+	if page <= 0:
+		return redirect(url_for('main.documents_page', page=1))
+	docs = document_models.getDocumentsByUserType(authentication.getCurrentUserType())
+	
+	if len(docs) == 0 and page != 1 or math.ceil(len(docs) / MAX_DOCUMENT_PER_PAGE) < page:
+		return redirect(url_for('main.documents_page', page=1))
+	return render_template(
+		'main/documents.html',
+		docs=docs[((page - 1) * MAX_DOCUMENT_PER_PAGE):MAX_DOCUMENT_PER_PAGE * page],
+		page=page,
+		maxPages= max(math.ceil(len(docs)/MAX_DOCUMENT_PER_PAGE), 1),
+		per_row=DOCUMENTS_PER_ROW,
+		per_page=MAX_DOCUMENT_PER_PAGE
+	)

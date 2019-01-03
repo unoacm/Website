@@ -28,9 +28,8 @@ class AdminLoginForm(RedirectForm):
 blueprint = Blueprint('admin', __name__, url_prefix='/admin')
 
 @blueprint.route('/')
+@authentication.login_required('admin')
 def index():
-	if not authentication.isLoggedIn(authentication.ADMIN):
-		return redirect(url_for('admin.login'))
 	users = user_models.User.query.all()
 	members = member_models.Member.query.all()
 	suggestions = suggestion_models.Suggestion.query.all()
@@ -44,23 +43,20 @@ def index():
 	return render_template('admin/index.html', data=data)
 
 @blueprint.route('/members')
+@authentication.login_required(authentication.ADMIN)
 def members():
-	if not authentication.isLoggedIn(authentication.ADMIN):
-		return redirect(url_for('admin.login'))
 	members = member_models.Member.query.all()
 	return render_template('admin/members.html', classType=member_models.Member, disabled_fields=[], data=members)
 
 @blueprint.route('/suggestions')
+@authentication.login_required(authentication.ADMIN)
 def suggestions():
-	if not authentication.isLoggedIn(authentication.ADMIN):
-		return redirect(url_for('admin.login'))
 	suggestions = suggestion_models.Suggestion.query.all()
 	return render_template('admin/suggestions.html', data=suggestions)
 
 @blueprint.route('/suggestions/<int:suggestion_id>')
+@authentication.login_required(authentication.ADMIN)
 def suggestion(suggestion_id):
-	if not authentication.isLoggedIn(authentication.ADMIN):
-		return redirect(url_for('admin.login'))
 	currentSuggestion = suggestion_models.Suggestion.exists_id(suggestion_id)
 	if currentSuggestion == None:
 		return redirect(url_for('admin.suggestions'))
@@ -83,6 +79,7 @@ def login():
 	return render_template('admin/login.html', form=loginForm)
 
 @blueprint.route('/logout', methods=['GET'])
+@authentication.login_required(authentication.ADMIN)
 def logout():
-	session.clear()
+	session[authentication.SESSION_USER] = (authentication.PUBLIC, None)
 	return redirect(url_for('admin.login'))

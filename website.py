@@ -12,6 +12,7 @@ import database.models.user as user_models
 import database.models.member as member_models
 import database.models.suggestion as suggestion_models
 import database.models.document as document_models
+import auth.auth as authentication
 
 app = Flask(__name__)
 app.app_context().push()

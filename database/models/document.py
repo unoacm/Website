@@ -11,7 +11,7 @@ from wtforms.validators import (
 	DataRequired
 )
 from flask import (
-	Blueprint, render_template, redirect, url_for, session, flash, 
+	Blueprint, render_template, redirect, url_for, session, flash, send_from_directory
 )
 
 class DocumentForm(RedirectForm):
@@ -63,17 +63,15 @@ class Document(db.Model):
 blueprint = Blueprint('document', __name__, url_prefix='/document')
 
 @blueprint.route('/new', methods=['GET', 'POST'])
+@authentication.login_required(authentication.ADMIN)
 def document_new():
-	if not authentication.isLoggedIn('admin'):
-		return redirect(url_for('admin.login'))
-
 	documentForm = DocumentForm()
 	if documentForm.validate_on_submit():
 		fileData = documentForm.file.data
 		title = documentForm.title.data
 		description = documentForm.description.data
 		document_access = documentForm.document_access.data
-		file_type = fileData.filename[fileData.filename.index('.'):]
+		file_type = fileData.filename[fileData.filename.rfind('.') + 1:]
 
 		newDocument = Document(title=title, description=description, document_access=document_access, file_type=file_type)
 		db.session.add(newDocument)
@@ -86,9 +84,8 @@ def document_new():
 	return render_template('models/document-form.html', form=documentForm, type='new')
 
 @blueprint.route('/<int:document_id>/edit', methods=['GET', 'POST'])
+@authentication.login_required(authentication.ADMIN)
 def document_edit(document_id):
-	if not authentication.isLoggedIn(authentication.ADMIN):
-		return redirect(url_for('admin.login'))
 	editingDocument = Document.exists_id(document_id)
 	if editingDocument == None:
 		return redirect(url_for('admin.index'))
@@ -101,7 +98,7 @@ def document_edit(document_id):
 		document_access = documentForm.document_access.data
 		
 		if fileData:
-			file_type = fileData.filename[fileData.filename.index('.'):]
+			file_type = fileData.filename[fileData.filename.rfind('.') + 1:]
 			editingDocument.file_type = file_type
 			uploadFile(fileData, document_id)
 
@@ -119,9 +116,8 @@ def document_edit(document_id):
 	return render_template('models/document-form.html', form=documentForm, type='edit')
 
 @blueprint.route('/<int:document_id>/delete', methods=['POST'])
+@authentication.login_required(authentication.ADMIN)
 def document_delete(document_id):
-	if not authentication.isLoggedIn(authentication.ADMIN):
-		return redirect(url_for('admin.login'))
 	editingDocument = Document.exists_id(document_id)
 	if editingDocument == None:
 		return redirect(url_for('admin.index'))
@@ -131,6 +127,29 @@ def document_delete(document_id):
 	db.session.commit()
 	flash('Document Deleted', 'success')
 	return redirect(utils.get_redirect_url() or url_for('admin.index'))
+
+@blueprint.route('/<int:document_id>/')
+def document_get(document_id):
+	from flask import current_app as app
+	user = authentication.getCurrentUserType()
+	gettingDocument = Document.query.filter_by(id=document_id).first()
+	if gettingDocument == None:
+		flash('Document Does not Exist')
+		return redirect(url_for('main.documents'))
+	if authentication.power(user) < authentication.power(gettingDocument.document_access):
+		flash('You do not have permission')
+		return redirect(url_for('main.documents'))
+
+	return send_from_directory(app.config['DOCUMENT_PATH'], str(document_id),
+			as_attachment = True,
+			attachment_filename=gettingDocument.title + "." + gettingDocument.file_type)
+
+def getDocumentsByUserType(type):
+	if type == authentication.ADMIN:
+		docs = Document.query.order_by(Document.title).all()
+	elif type == authentication.PUBLIC:
+		docs = Document.query.order_by(Document.title).filter_by(document_access=authentication.PUBLIC).all()
+	return docs
 
 def uploadFile(fileData, id):
 	from flask import current_app as app

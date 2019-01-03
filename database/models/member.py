@@ -51,10 +51,8 @@ class Member(db.Model):
 blueprint = Blueprint('member', __name__, url_prefix='/member')
 
 @blueprint.route('/new', methods=['GET', 'POST'])
+@authentication.login_required(authentication.ADMIN)
 def member_new():
-	if not authentication.isLoggedIn(authentication.ADMIN):
-		return redirect(url_for('admin.login'))
-	
 	memberForm = MemberCreateForm()
 	if memberForm.validate_on_submit():
 		first_name = memberForm.first_name.data
@@ -73,9 +71,8 @@ def member_new():
 	return render_template('models/member-form.html', form=memberForm, type='new')
 
 @blueprint.route('<int:member_id>/edit', methods=['GET', 'POST'])
+@authentication.login_required(authentication.ADMIN)
 def member_edit(member_id):
-	if not authentication.isLoggedIn(authentication.ADMIN):
-		return redirect(url_for('admin.login'))
 	editingMember = Member.exists_id(member_id)
 	if editingMember == None:
 		return redirect(url_for('admin.index'))
@@ -101,9 +98,8 @@ def member_edit(member_id):
 	return render_template('models/member-form.html', form=memberForm, type='edit')
 
 @blueprint.route('<int:member_id>/delete', methods=['POST'])
+@authentication.login_required(authentication.ADMIN)
 def member_delete(member_id):
-	if not authentication.isLoggedIn(authentication.ADMIN):
-		return redirect(url_for('admin.login'))
 	editingMember = Member.exists_id(member_id)
 	if editingMember == None:
 		return redirect(url_for('admin.index'))

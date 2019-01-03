@@ -77,9 +77,8 @@ def suggestion_new():
 	return render_template('models/suggestion-form.html', form=suggestionForm, type='new')
 
 @blueprint.route('<int:suggestion_id>/edit', methods=['GET', 'POST'])
+@authentication.login_required(authentication.ADMIN)
 def suggestion_edit(suggestion_id):
-	if not authentication.isLoggedIn(authentication.ADMIN):
-		return redirect(url_for('admin.login'))
 	editingSuggestion = Suggestion.exists_id(suggestion_id)
 	if editingSuggestion == None:
 		return utils.redirect('admin.index')
@@ -101,9 +100,8 @@ def suggestion_edit(suggestion_id):
 	return render_template('models/suggestion-form.html', form=suggestionForm)
 
 @blueprint.route('<int:suggestion_id>/delete', methods=['POST'])
+@authentication.login_required(authentication.ADMIN)
 def suggestion_delete(suggestion_id):
-	if not authentication.isLoggedIn(authentication.ADMIN):
-		return redirect(url_for('admin.login'))
 	editingSuggestion = Suggestion.exists_id(suggestion_id)
 	if editingSuggestion == None:
 		return redirect(url_for('admin.index'))
