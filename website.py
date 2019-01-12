@@ -23,7 +23,7 @@ databaseURL = ''
 if app.env == 'development':
 	databaseURL = 'sqlite:///database/test.db'
 elif app.env == 'production':
-	databaseURL = 'sqlite:///database/production.db'
+	databaseURL = os.environ['DATABASE_URL']
 else:
 	raise ValueError(f'Invalid environment: {app.env}')
 
