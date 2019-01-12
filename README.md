@@ -40,4 +40,8 @@ py website.py
 
 FLASK_ENV : 'development', 'production' : This tells flask whether the app is in development or production. In production a different database name/type will be used.
 
+FLASK_ADMIN_USERNAME : anything : This will be used in creation of the default admin to sign in to the admin page
+
+FLASK_ADMIN_PASSWORD : anything : This will be used in creation of the default admin to sign in to the admin page
+
 More installation instructions might appear as this application gets ready for production.
