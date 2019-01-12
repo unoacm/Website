@@ -36,4 +36,8 @@ or
 py website.py
 ```
 
+## Needed Environmental Variables
+
+FLASK_ENV : 'development', 'production' : This tells flask whether the app is in development or production. In production a different database name/type will be used.
+
 More installation instructions might appear as this application gets ready for production.

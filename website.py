@@ -18,10 +18,20 @@ import auth.auth as authentication
 app = Flask(__name__)
 app.app_context().push()
 app.instance_path = app.root_path
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database/test.db'
+
+databaseURL = ''
+if app.env == 'development':
+	databaseURL = 'sqlite:///database/test.db'
+elif app.env == 'production':
+	databaseURL = 'sqlite:///database/production.db'
+else:
+	raise ValueError(f'Invalid environment: {app.env}')
+
+app.config['SQLALCHEMY_DATABASE_URI'] = databaseURL
 app.config['SECRET_KEY'] = "Gotta make sure this key is super dang long, yeehaw!"
 app.config['DOCUMENT_PATH'] = os.path.join(app.instance_path, 'documents')
 app.config['EVENT_PATH'] = os.path.join(app.instance_path, 'events')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
 db.create_all()
