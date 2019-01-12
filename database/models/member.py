@@ -21,9 +21,9 @@ class MemberCreateForm(RedirectForm):
 
 class Member(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
-	first_name = db.Column(db.String(30), nullable=False)
-	last_name = db.Column(db.String(30), nullable=False)
-	email = db.Column(db.String(30))
+	first_name = db.Column(db.String(), nullable=False)
+	last_name = db.Column(db.String(), nullable=False)
+	email = db.Column(db.String())
 
 	def __init__(self, first_name, last_name, email=None):
 		self.first_name = first_name

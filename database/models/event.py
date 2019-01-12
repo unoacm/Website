@@ -49,13 +49,13 @@ class EventEditForm(EventForm):
 
 class Event(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
-	title = db.Column(db.String(30), nullable=False)
-	description = db.Column(db.String(400), nullable=False)
+	title = db.Column(db.String(), nullable=False)
+	description = db.Column(db.String(), nullable=False)
 	start_time = db.Column(db.Time(), nullable=False)
 	end_time = db.Column(db.Time(), nullable=False)
 	date = db.Column(db.Date(), nullable=False)
-	location = db.Column(db.String(50), nullable=False)
-	picture_type = db.Column(db.String(10), nullable=False)
+	location = db.Column(db.String(), nullable=False)
+	picture_type = db.Column(db.String(), nullable=False)
 	documents = db.relationship('Document', backref='event', lazy='dynamic')
 	
 	def __init__(self, title, description, location, start_time, end_time, date, picture_type, documents):

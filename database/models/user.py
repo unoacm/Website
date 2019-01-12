@@ -32,9 +32,9 @@ class UserEditForm(UserCreateForm):
 
 class User(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
-	username = db.Column(db.String(80), unique=True, nullable=False)
-	password = db.Column(db.String(64), nullable=False) # String 64 for SHA-256 hashing
-	user_type = db.Column(db.String(30), nullable=False)
+	username = db.Column(db.String(), unique=True, nullable=False)
+	password = db.Column(db.String(), nullable=False) # String 64 for SHA-256 hashing
+	user_type = db.Column(db.String(), nullable=False)
 
 	def __init__(self, username, password, user_type):
 		self.username = username

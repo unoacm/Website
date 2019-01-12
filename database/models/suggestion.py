@@ -22,10 +22,10 @@ class SuggestionForm(RedirectForm):
 
 class Suggestion(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
-	first_name = db.Column(db.String(30))
-	last_name = db.Column(db.String(30))
-	title = db.Column(db.String(30), nullable=False)
-	description = db.Column(db.String(500), nullable=False)
+	first_name = db.Column(db.String())
+	last_name = db.Column(db.String())
+	title = db.Column(db.String(), nullable=False)
+	description = db.Column(db.String(), nullable=False)
 	date = db.Column(db.Date(), nullable=False)
 
 	def __init__(self, title, description, first_name=None, last_name=None):

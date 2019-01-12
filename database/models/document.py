@@ -31,10 +31,10 @@ class DocumentEditForm(DocumentForm):
 
 class Document(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
-	title = db.Column(db.String(30), nullable=False)
-	description = db.Column(db.String(200), nullable=False)
-	document_access = db.Column(db.String(20), nullable=False)
-	file_type = db.Column(db.String(10), nullable=False)
+	title = db.Column(db.String(), nullable=False)
+	description = db.Column(db.String(), nullable=False)
+	document_access = db.Column(db.String(), nullable=False)
+	file_type = db.Column(db.String(), nullable=False)
 	event_id = db.Column(db.Integer, db.ForeignKey('event.id'))
 	
 	def __init__(self, title, description, file_type, document_access='public'):
