@@ -1,0 +1,42 @@
+{% extends 'admin/base.html' %}
+{% block events_admin_active %}active{% endblock %}
+{% import "main/utils.html" as utils %}
+{% block content %}
+	{{super()}}
+	{{utils.flashes()}}
+	<h1 class="text-center">Events</h1>
+	<hr>
+	<div class="container">
+		<div class="list-group">
+			{% for event in data %}
+				<a href="{% if event in events_coming %}{{url_for('main.events')}}{% else %}{{url_for('main.events_past')}}{% endif %}" class="shadow-sm list-group-item list-group-item-action flex-column align-items-start">
+					<div class="d-flex w-100 justify-content-between">
+						<h5 class="mb-1">{{event.title}}</h5>
+						<small>{{event.date}} {{event.start_time.strftime('%I:%M%p')}}-{{event.end_time.strftime('%I:%M%p')}}</small>
+					</div>
+					<p class="mb-1">
+						{% if event.description|length >= 80 %}
+							{{event.description[:80]}}...
+						{% else %}
+							{{event.description}}
+						{% endif %}
+					</p>
+					<small>
+						{{event.location}} 
+						{% if event in events_past %}
+							<span class="text-warning">(Event Passed)</span>
+						{% elif event in events_coming %}
+							<span class="text-info">(Event Coming)</span>
+						{% else %}
+							<span class="text-success">(Event Today)</span>
+						{% endif %}
+					</small>
+				</a>
+			{% endfor %}
+		</div>
+	</div>
+{% endblock %}}
+{% block footer %}
+	{{super()}}
+	<script src="{{url_for('static', filename='js/suggestions.js')}}"></script>
+{% endblock %}

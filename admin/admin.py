@@ -18,7 +18,9 @@ import database.models.user as user_models
 import database.models.suggestion as suggestion_models
 import database.models.member as member_models
 import database.models.document as document_models
+import database.models.event as event_models
 import utils.utils as utils
+import datetime
 
 class AdminLoginForm(RedirectForm):
 	username = StringField("Username: ", validators=[DataRequired()])
@@ -34,11 +36,13 @@ def index():
 	members = member_models.Member.query.all()
 	suggestions = suggestion_models.Suggestion.query.all()
 	documents = document_models.Document.query.all()
+	events = event_models.Event.query.all()
 	data = [
 		["Users", user_models.User, ['password'], users],
 		["Members", member_models.Member, [], members],
 		["Suggestions", suggestion_models.Suggestion, ['description'], suggestions],
-		["Documents", document_models.Document, ['description'], documents]
+		["Documents", document_models.Document, ['description'], documents],
+		['Events', event_models.Event, ['description', 'date', 'start_time', 'end_time', 'location', 'picture_type'], events]
 	]
 	return render_template('admin/index.html', data=data)
 
@@ -48,20 +52,20 @@ def members():
 	members = member_models.Member.query.all()
 	return render_template('admin/members.html', classType=member_models.Member, disabled_fields=[], data=members)
 
+@blueprint.route('/events')
+@authentication.login_required(authentication.ADMIN)
+def events():
+	events = event_models.Event.query.all()
+	today = datetime.date.today()
+	events_coming = event_models.Event.query.filter(event_models.Event.date > today).all()
+	events_past = event_models.Event.query.filter(event_models.Event.date < today).all()
+	return render_template('admin/events.html', data=events, events_coming=events_coming, events_past=events_past)
+
 @blueprint.route('/suggestions')
 @authentication.login_required(authentication.ADMIN)
 def suggestions():
 	suggestions = suggestion_models.Suggestion.query.all()
 	return render_template('admin/suggestions.html', data=suggestions)
-
-@blueprint.route('/suggestions/<int:suggestion_id>')
-@authentication.login_required(authentication.ADMIN)
-def suggestion(suggestion_id):
-	currentSuggestion = suggestion_models.Suggestion.exists_id(suggestion_id)
-	if currentSuggestion == None:
-		return redirect(url_for('admin.suggestions'))
-	
-	return render_template('admin/suggestion.html', data=currentSuggestion)
 
 @blueprint.route('/login', methods=['GET', 'POST'])
 def login():

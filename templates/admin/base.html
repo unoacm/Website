@@ -6,7 +6,7 @@
 		<a class="nav-item nav-link {% block dashboard_active %}{% endblock %}" href="{{url_for('admin.index')}}">Admin Dashboard</a>
 		<a class="nav-item nav-link {% block members_active %}{% endblock %}" href="{{url_for('admin.members')}}">Members</a>
 		<a class="nav-item nav-link {% block suggestion_active %}{% endblock %}" href="{{url_for('admin.suggestions')}}">Suggestions</a>
-		<a class="nav-item nav-link {% block events_active %}{% endblock %} disabled" href="#">Events</a>
+		<a class="nav-item nav-link {% block events_admin_active %}{% endblock %}" href="{{url_for('admin.events')}}">Events</a>
 		<a class="nav-item nav-link {% block blog_active %}{% endblock %} disabled" href="#">Blog</a>
 		<a class="nav-item nav-link {% block documents_admin_active %}{% endblock %}" href="{{url_for('main.documents')}}">Documents</a>
 	</nav>

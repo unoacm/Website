@@ -26,14 +26,22 @@
 
 			{% for field in wtform if field.name != "csrf_token" %}
 			<div class="form-group">
-					{% if field.name not in ["submit", "next", "file"] %}
+					{% if field.name not in ["submit", "next", "file", "removeFile", 'picture'] %}
 						{{ field.label() }}
 				{% endif %}
 					{% if field.name == "submit" %}
 					{{ field(class_="btn btn-primary") }}
-					{% elif field.name == "file" %}
+					{% elif field.name == 'file' %}
 						<div class="custom-file">
 							{{ field(class_="custom-file-input", id="validatedCustomFile") }}
+							{{ field.label(class_="custom-file-label") }}
+						</div>
+					{% elif field.name == 'removeFile' %}
+						{{ field(class_="form-check-input") }}
+						{{ field.label(class_="form-check-label") }}
+					{% elif field.name == 'picture' %}
+						<div class="custom-file">
+							{{ field(class_="custom-file-input", id="validatedCustomFile", accept="image/png, image/jpeg, image/jpg, image/gif") }}
 							{{ field.label(class_="custom-file-label") }}
 						</div>
 					{% else %}
@@ -68,6 +76,9 @@
 							{% if name is not in disabled_fields %}
 								<td>
 									{% if name == 'id' %}
+										{% if datum['getGetRoute'] %}
+											<a href='{{datum.getGetRoute()}}'>
+										{% endif %}
 										<strong>
 									{% endif %}
 									{% if datum[name]|string|length >= 80 %}
@@ -77,6 +88,9 @@
 									{% endif %}
 									{% if name == 'id' %}
 										</strong>
+										{% if datum['getGetRoute'] %}
+											</a>
+										{% endif %}
 									{% endif %}
 								</td>
 							{% endif %}

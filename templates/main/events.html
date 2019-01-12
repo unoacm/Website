@@ -1,8 +1,52 @@
-{% extends "main/base.html" %}
+{% extends 'main/base.html' %}
+{% import "main/utils.html" as utils %}
 {% block title %}Events{% endblock %}
 {% block events_active %}active{% endblock %}
 {% block content %}
-<div class="container">
-	<p>Events should go here!</p>
-</div>
+	<nav class="nav nav-pills nav-fill">
+		<a href="{{url_for('main.events')}}" class="nav-item nav-link {% if type=='current' %}active{% endif %}">Events</a>
+		<a href="{{url_for('main.events_past')}}" class="nav-item nav-link {% if type=='past' %}active{% endif %}">Past Events</a>
+	</nav>
+	<hr>
+	{% if events|length == 0 %}
+		<div class="jumbotron jumbotron-fluid">
+			<div class="container">
+				<h1 class="display-4">No {% block event_type %}{% endblock %} Events</h1>
+				<p class="lead">Sorry, there are no {% block event2_type %}{% endblock %} events. Check back again.</p>
+			</div>
+		</div>
+	{% endif %}
+	<div class="container">
+		{% for event in events %}
+			<div class="card mb-3">
+				<img src="{{event.getPicture()}}" class="card-img event-image" alt="Event Picture">
+				<div class="card-body">
+					<h4 class="card-title">{{event.title}}</h5>
+					<hr>
+					<p class="card-text">
+						{{event.description}}
+					</p>
+					<hr>
+					<p class="card-text text-muted"><small>Location: {{event.location}}</small></p>
+					<p class="card-text text-muted"><small>Date: {{event.date}}</small></p>
+					<p class="card-text text-muted d-inline-block"><small>Time: {{event.start_time.strftime('%I:%M%p')}} - {{event.end_time.strftime('%I:%M%p')}}</small></p>
+					{% if session['user'] and session['user'][0] == 'admin' %}
+						<a class="btn btn-warning float-right" href="{{event.getEditRoute()}}">Edit</a>
+						<form action="{{event.getDeleteRoute()}}" method="POST">
+							<button value="submit" class="btn btn-danger float-right delete-confirm">Delete</button>
+						</form>
+					{% endif %}
+					{% if event.documents.all()|length > 0 %}
+						<a href="{{event.getDocuments()}}">
+							<img class="icon float-right" src="{{url_for('static', filename='icons/si-glyph-paper-clip.svg')}}">
+						</a>
+					{% endif %}
+				</div>
+			</div>
+		{% endfor %}
+	</div>
+{% endblock %}
+{% block footer %}
+	{{super()}}
+	<script src="{{url_for('static', filename='js/deleteLinks.js')}}"></script>
 {% endblock %}

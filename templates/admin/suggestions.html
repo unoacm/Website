@@ -1,13 +1,15 @@
 {% extends 'admin/base.html' %}
 {% block suggestion_active %}active{% endblock %}
+{% import "main/utils.html" as utils %}
 {% block content %}
 	{{super()}}
+	{{utils.flashes()}}
 	<h1 class="text-center">Suggestions</h1>
 	<hr>
 	<div class="container">
 		<div class="list-group">
 			{% for suggestion in data %}
-				<a href="{{url_for('admin.suggestion', suggestion_id=suggestion.id)}}" class="shadow-sm list-group-item list-group-item-action flex-column align-items-start">
+				<a href="{{suggestion.getGetRoute()}}" class="shadow-sm list-group-item list-group-item-action flex-column align-items-start">
 					<div class="d-flex w-100 justify-content-between">
 						<h5 class="mb-1">{{suggestion.title}}</h5>
 						<small>{{suggestion.date}}</small>

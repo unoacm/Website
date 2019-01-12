@@ -5,7 +5,7 @@ import auth.auth as authentication
 import utils.utils as utils
 import os
 from wtforms import (
-	StringField, SubmitField, PasswordField, SelectField, FileField
+	StringField, SubmitField, SelectField, FileField
 )
 from wtforms.validators import (
 	DataRequired
@@ -35,6 +35,7 @@ class Document(db.Model):
 	description = db.Column(db.String(200), nullable=False)
 	document_access = db.Column(db.String(20), nullable=False)
 	file_type = db.Column(db.String(10), nullable=False)
+	event_id = db.Column(db.Integer, db.ForeignKey('event.id'))
 	
 	def __init__(self, title, description, file_type, document_access='public'):
 		self.title = title
@@ -59,6 +60,9 @@ class Document(db.Model):
 	
 	def getDeleteRoute(self):
 		return url_for('document.document_delete', document_id=self.id)
+	
+	def getGetRoute(self):
+		return url_for('document.document_get', document_id=self.id)
 
 blueprint = Blueprint('document', __name__, url_prefix='/document')
 
@@ -123,7 +127,7 @@ def document_delete(document_id):
 		return redirect(url_for('admin.index'))
 
 	deleteFile(document_id)
-	Document.query.filter_by(id=document_id).delete()
+	db.session.delete(editingDocument)
 	db.session.commit()
 	flash('Document Deleted', 'success')
 	return redirect(utils.get_redirect_url() or url_for('admin.index'))

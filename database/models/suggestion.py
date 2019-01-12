@@ -53,6 +53,9 @@ class Suggestion(db.Model):
 	def getDeleteRoute(self):
 		return url_for('suggestion.suggestion_delete', suggestion_id=self.id)
 
+	def getGetRoute(self):
+		return url_for('suggestion.suggestion_get', suggestion_id=self.id)
+
 blueprint = Blueprint('suggestion', __name__, url_prefix='/suggestion')
 
 @blueprint.route('new', methods=['GET', 'POST'])
@@ -109,3 +112,12 @@ def suggestion_delete(suggestion_id):
 	db.session.commit()
 	flash('Suggestion Deleted', 'success')
 	return redirect(utils.get_redirect_url() or url_for('admin.index'))
+
+@blueprint.route('/<int:suggestion_id>')
+@authentication.login_required(authentication.ADMIN)
+def suggestion_get(suggestion_id):
+	currentSuggestion = Suggestion.exists_id(suggestion_id)
+	if currentSuggestion == None:
+		return redirect(url_for('admin.suggestions'))
+	
+	return render_template('admin/suggestion.html', data=currentSuggestion)

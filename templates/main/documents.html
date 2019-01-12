@@ -10,6 +10,13 @@
 {% block content %}
 	{{super()}}
 	{{utils.flashes()}}
+	<h1 class="heading d-inline-block">Documents</h1>
+	{% if session['user'] and session['user'][0] == 'admin' %}
+		<nav class="nav d-inline-block">
+			<a class="nav-link" href="{{url_for('document.document_new')}}"><img class="icon section-add" src="{{url_for('static', filename='icons/si-glyph-plus.svg')}}" ></a>
+		</nav>
+	{% endif %}
+	<hr>
 	{% if docs|length == 0 %}
 		<div class="jumbotron jumbotron-fluid">
 			<div class="container">
@@ -17,9 +24,6 @@
 				<p class="lead">Sorry, no documents are available at this time. Check back again.</p>
 			</div>
 		</div>
-	{% else %}
-		<h1 id="documents-heading">Documents</h1>
-		<hr>
 	{% endif %}
 	<div class="container-fluid">
 		{% for doc in docs %}
@@ -40,15 +44,15 @@
 						<p class="card-text">{{doc.description}}</p>
 						<div class="d-flex">
 							<div class="p-1 justify-content-start">
-								<a href="{{url_for('document.document_get', document_id=doc.id)}}" class="btn btn-primary">Download</a>
+								<a href="{{doc.getGetRoute()}}" class="btn btn-primary">Download</a>
 							</div>
 							{% if session['user'] and session['user'][0] == 'admin' %}
 								<div class="p-1 justify-content-end">
-									<a class="btn btn-warning" href="{{url_for('document.document_edit', document_id=doc.id)}}">Edit</a>
+									<a class="btn btn-warning" href="{{doc.getEditRoute()}}">Edit</a>
 								</div>
 								<div class="p-1 justify-content-end">
-									<form action="{{url_for('document.document_delete', document_id=doc.id)}}" method="POST">
-										<button value="submit" class="btn btn-danger">Delete</button>
+									<form action="{{doc.getDeleteRoute()}}" method="POST">
+										<button value="submit" class="btn btn-danger delete-confirm">Delete</button>
 									</form>
 								</div>
 							{% endif %}
@@ -81,4 +85,8 @@
 			</li>
 		</ul>
 	</nav>
+{% endblock %}
+{% block footer %}
+	{{super()}}
+	<script src="{{url_for('static', filename='js/deleteLinks.js')}}"></script>
 {% endblock %}
