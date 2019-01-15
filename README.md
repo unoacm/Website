@@ -44,6 +44,4 @@ FLASK_ADMIN_USERNAME : anything : This will be used in creation of the default a
 
 FLASK_ADMIN_PASSWORD : anything : This will be used in creation of the default admin to sign in to the admin page
 
-DATABASE_URL : anything : This is used in production for the path to the production database
-
 More installation instructions might appear as this application gets ready for production.
