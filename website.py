@@ -4,7 +4,7 @@ from flask import (
 from flask_sqlalchemy import SQLAlchemy
 
 from database.sqldb import db as db
-import os
+import os, sys
 import main.main as main
 import blog.blog as blog
 import admin.admin as admin
@@ -46,20 +46,22 @@ app.register_blueprint(suggestion_models.blueprint)
 app.register_blueprint(document_models.blueprint)
 app.register_blueprint(event_models.blueprint)
 
-if __name__ == "__main__":
-	if not os.environ.get('FLASK_ADMIN_USERNAME'):
+if not os.environ.get('FLASK_ADMIN_USERNAME'):
 		raise ValueError('FLASK_ADMIN_USERNAME not set')
-	if not os.environ.get('FLASK_ADMIN_PASSWORD'):
-		raise ValueError('FLASK_ADMIN_PASSWORD not set')
-	default_admin = user_models.User.query.filter_by(user_type=authentication.ADMIN, username=os.environ['FLASK_ADMIN_USERNAME']).first()
-	print("**********************************")
-	print(default_admin)
-	print("**********************************")
-	if not default_admin:
-		admin = user_models.User(username=os.environ['FLASK_ADMIN_USERNAME'], password=os.environ['FLASK_ADMIN_PASSWORD'], user_type=authentication.ADMIN)
-		db.session.add(admin)
-		db.session.commit()
+if not os.environ.get('FLASK_ADMIN_PASSWORD'):
+	raise ValueError('FLASK_ADMIN_PASSWORD not set')
+default_admin = user_models.User.query.filter_by(user_type=authentication.ADMIN, username=os.environ['FLASK_ADMIN_USERNAME']).first()
+if not default_admin:
+	admin = user_models.User(username=os.environ['FLASK_ADMIN_USERNAME'], password=os.environ['FLASK_ADMIN_PASSWORD'], user_type=authentication.ADMIN)
+	db.session.add(admin)
+	db.session.commit()
+
+if __name__ == "__main__":
 	if app.env == 'development':
 		app.run()
 	elif app.env == 'production':
-		app.run(host='0.0.0.0')
+		print('Please use gunicorn and a wsgi file to run production')
+		sys.exit(1)
+	else:
+		print(f'Invalid FLASK_ENV: {app.env}')
+		sys.exit(1)
