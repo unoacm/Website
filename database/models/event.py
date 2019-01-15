@@ -30,7 +30,8 @@ def validate_file_ext(form, field):
 class EventForm(RedirectForm):
 	title = StringField("Title: ", validators=[DataRequired()])
 	description = TextAreaField("Description: ", validators=[DataRequired()])
-	date = DateField('Date: ', validators=[DataRequired()])
+	start_date = DateField('Start Date: ', validators=[DataRequired()])
+	end_date = DateField('End Date: ', validators=[DataRequired()])
 	start_time = TimeField('Start Time: ', validators=[DataRequired()])
 	end_time = TimeField('End Time: ', validators=[DataRequired()])
 	location = StringField('Location: ', validators=[DataRequired()])
@@ -44,7 +45,6 @@ class EventForm(RedirectForm):
 
 class EventEditForm(EventForm):
 	picture = FileField("Choose Cover Picture...", validators=[validate_file_ext])
-	# files = SelectMultipleField("Select Documents...")
 	submit = SubmitField("Submit")
 
 class Event(db.Model):
@@ -53,24 +53,26 @@ class Event(db.Model):
 	description = db.Column(db.String(), nullable=False)
 	start_time = db.Column(db.Time(), nullable=False)
 	end_time = db.Column(db.Time(), nullable=False)
-	date = db.Column(db.Date(), nullable=False)
+	start_date = db.Column(db.Date(), nullable=False)
+	end_date = db.Column(db.Date(), nullable=False)
 	location = db.Column(db.String(), nullable=False)
 	picture_type = db.Column(db.String(), nullable=False)
 	documents = db.relationship('Document', backref='event', lazy='dynamic')
 	
-	def __init__(self, title, description, location, start_time, end_time, date, picture_type, documents):
+	def __init__(self, title, description, location, start_time, end_time, start_date, end_date, picture_type, documents):
 		self.title = title
 		self.description = description
 		self.start_time = start_time
 		self.end_time = end_time
-		self.date = date
+		self.start_date = start_date
+		self.end_date = end_date
 		self.location = location
 		self.picture_type = picture_type
 		self.documents = documents
 
 	@staticmethod
 	def __dir__():
-		return ['id', 'title', 'description', 'date', 'start_time', 'end_time', 'location', 'picture_type']
+		return ['id', 'title', 'description', 'start_date', 'end_date', 'start_time', 'end_time', 'location', 'picture_type']
 
 	@staticmethod
 	def exists_id(id):
@@ -104,7 +106,8 @@ def event_new():
 	if eventForm.validate_on_submit():
 		title = eventForm.title.data
 		description = eventForm.description.data
-		date = eventForm.date.data
+		start_date = eventForm.start_date.data
+		end_date = eventForm.end_date.data
 		start_time = eventForm.start_time.data
 		end_time = eventForm.end_time.data
 		location = eventForm.location.data
@@ -117,7 +120,7 @@ def event_new():
 				if int(d) == doc.id:
 					list_of_docs.append(doc)
 
-		newEvent = Event(title=title, description=description, location=location, start_time=start_time, end_time=end_time, date=date, picture_type=picture_type, documents=list_of_docs)
+		newEvent = Event(title=title, description=description, location=location, start_time=start_time, end_time=end_time, start_date=start_date, end_date=end_date, picture_type=picture_type, documents=list_of_docs)
 		db.session.add(newEvent)
 		db.session.commit()
 		uploadFile(pictureData, str(newEvent.id) + '.' + picture_type)
@@ -141,7 +144,8 @@ def event_edit(event_id):
 	if eventForm.validate_on_submit():
 		title = eventForm.title.data
 		description = eventForm.description.data
-		date = eventForm.date.data
+		start_date = eventForm.start_date.data
+		end_date = eventForm.end_date.data
 		start_time = eventForm.start_time.data
 		end_time = eventForm.end_time.data
 		location = eventForm.location.data
@@ -157,7 +161,8 @@ def event_edit(event_id):
 		editingEvent.title = title
 		editingEvent.description = description
 		editingEvent.location = location
-		editingEvent.date = date
+		editingEvent.start_date = start_date
+		editingEvent.end_date = end_date
 		editingEvent.start_time = start_time
 		editingEvent.end_time = end_time
 
@@ -178,7 +183,8 @@ def event_edit(event_id):
 	eventForm.process()
 	eventForm.title.data = editingEvent.title
 	eventForm.description.data = editingEvent.description
-	eventForm.date.data = editingEvent.date
+	eventForm.start_date.data = editingEvent.start_date
+	eventForm.end_date.data = editingEvent.end_date
 	eventForm.start_time.data = editingEvent.start_time
 	eventForm.end_time.data = editingEvent.end_time
 	eventForm.location.data = editingEvent.location

@@ -55,10 +55,10 @@ def members():
 @blueprint.route('/events')
 @authentication.login_required(authentication.ADMIN)
 def events():
-	events = event_models.Event.query.all()
+	events = event_models.Event.query.order_by(event_models.Event.end_date.desc()).all()
 	today = datetime.date.today()
-	events_coming = event_models.Event.query.filter(event_models.Event.date > today).all()
-	events_past = event_models.Event.query.filter(event_models.Event.date < today).all()
+	events_coming = event_models.Event.query.filter(event_models.Event.end_date > today).filter(event_models.Event.start_date > today).all()
+	events_past = event_models.Event.query.filter(event_models.Event.end_date < today).all()
 	return render_template('admin/events.html', data=events, events_coming=events_coming, events_past=events_past)
 
 @blueprint.route('/suggestions')

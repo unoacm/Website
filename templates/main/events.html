@@ -28,7 +28,7 @@
 					</p>
 					<hr>
 					<p class="card-text text-muted"><small>Location: {{event.location}}</small></p>
-					<p class="card-text text-muted"><small>Date: {{event.date}}</small></p>
+					<p class="card-text text-muted"><small>Date: {{event.start_date}}{% if event.start_date!=event.end_date %}-{{event.end_date}}{% endif %}</small></p>
 					<p class="card-text text-muted d-inline-block"><small>Time: {{event.start_time.strftime('%I:%M%p')}} - {{event.end_time.strftime('%I:%M%p')}}</small></p>
 					{% if session['user'] and session['user'][0] == 'admin' %}
 						<a class="btn btn-warning float-right" href="{{event.getEditRoute()}}">Edit</a>

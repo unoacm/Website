@@ -9,10 +9,10 @@
 	<div class="container">
 		<div class="list-group">
 			{% for event in data %}
-				<a href="{% if event in events_coming %}{{url_for('main.events')}}{% else %}{{url_for('main.events_past')}}{% endif %}" class="shadow-sm list-group-item list-group-item-action flex-column align-items-start">
+				<a href="{% if event in events_coming or event not in events_past %}{{url_for('main.events')}}{% else %}{{url_for('main.events_past')}}{% endif %}" class="shadow-sm list-group-item list-group-item-action flex-column align-items-start">
 					<div class="d-flex w-100 justify-content-between">
 						<h5 class="mb-1">{{event.title}}</h5>
-						<small>{{event.date}} {{event.start_time.strftime('%I:%M%p')}}-{{event.end_time.strftime('%I:%M%p')}}</small>
+						<small>{{event.start_date}}{% if event.start_date!=event.end_date %}-{{event.end_date}}{% endif %} {{event.start_time.strftime('%I:%M%p')}}-{{event.end_time.strftime('%I:%M%p')}}</small>
 					</div>
 					<p class="mb-1">
 						{% if event.description|length >= 80 %}

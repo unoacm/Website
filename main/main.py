@@ -20,13 +20,13 @@ def about():
 @blueprint.route('events')
 def events():
 	today = datetime.date.today()
-	events = event_models.Event.query.filter(event_models.Event.date >= today).all()
+	events = event_models.Event.query.filter(event_models.Event.end_date >= today).order_by(event_models.Event.end_date.desc()).all()
 	return render_template('main/events.html', events=events, type='current')
 
 @blueprint.route('events/past')
 def events_past():
 	today = datetime.date.today()
-	events = event_models.Event.query.filter(event_models.Event.date < today).all()
+	events = event_models.Event.query.filter(event_models.Event.end_date < today).order_by(event_models.Event.end_date.desc()).all()
 	return render_template('main/events.html', events=events, type='past')
 
 @blueprint.route('documents')
