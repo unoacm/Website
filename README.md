@@ -36,6 +36,14 @@ or
 py website.py
 ```
 
+## Production Run
+Currently the application is running in a Debian instance on Google Cloud Platform. An installation guide will be posted here at some point.
+
+To run the server:
+```
+source start.sh
+```
+
 ## Needed Environmental Variables
 
 FLASK_ENV : 'development', 'production' : This tells flask whether the app is in development or production. In production a different database name/type will be used.
