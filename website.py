@@ -59,4 +59,7 @@ if __name__ == "__main__":
 		admin = user_models.User(username=os.environ['FLASK_ADMIN_USERNAME'], password=os.environ['FLASK_ADMIN_PASSWORD'], user_type=authentication.ADMIN)
 		db.session.add(admin)
 		db.session.commit()
-	app.run()
+	if app.env == 'development':
+		app.run()
+	elif app.env == 'production':
+		app.run(host='0.0.0.0')
