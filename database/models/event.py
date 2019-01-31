@@ -99,8 +99,8 @@ class Event(db.Model):
 
 blueprint = Blueprint('event', __name__, url_prefix='/event')
 
-@authentication.can_write(Event.__name__)
 @blueprint.route('/new', methods=['GET', 'POST'])
+@authentication.can_write(Event.__name__)
 def event_new():
 	eventForm = EventForm()
 	docs = document_models.getDocumentsByUserType(authentication.PUBLIC)
@@ -135,8 +135,8 @@ def event_new():
 
 	return authentication.auth_render_template('admin/model.html', form=eventForm, type='new', model=Event, breadcrumbTitle='New Event')
 
-@authentication.can_read(Event.__name__)
 @blueprint.route('/<int:event_id>/edit', methods=['GET', 'POST'])
+@authentication.can_read(Event.__name__)
 def event_edit(event_id):
 	editingEvent = Event.exists_id(event_id)
 	if editingEvent == None:
@@ -198,8 +198,8 @@ def event_edit(event_id):
 	
 	return authentication.auth_render_template('admin/model.html', form=eventForm, type='edit', model=Event, breadcrumbTitle=eventForm.title.data, data=editingEvent)
 
-@authentication.can_write(Event.__name__)
 @blueprint.route('/<int:event_id>/delete', methods=['POST'])
+@authentication.can_write(Event.__name__)
 def event_delete(event_id):
 	editingEvent = Event.exists_id(event_id)
 	if editingEvent == None:
@@ -221,8 +221,8 @@ def event_get(event_id):
 		return redirect(url_for('main.events'))
 	return render_template('main/event.html', data=currentEvent)
 
-@authentication.can_read(Event.__name__)
 @blueprint.route('events')
+@authentication.can_read(Event.__name__)
 def events_get():
 	events = Event.query.all()
 	hidden_fields = ['id', 'description', 'picture_type', 'documents']

@@ -54,8 +54,8 @@ class Member(db.Model):
 
 blueprint = Blueprint('member', __name__, url_prefix='/member')
 
-@authentication.can_write(Member.__name__)
 @blueprint.route('/new', methods=['GET', 'POST'])
+@authentication.can_write(Member.__name__)
 def member_new():
 	memberForm = MemberCreateForm()
 	if memberForm.validate_on_submit():
@@ -76,8 +76,8 @@ def member_new():
 	
 	return authentication.auth_render_template('admin/model.html', form=memberForm, type='new', model=Member, breadcrumbTitle='New Member')
 
-@authentication.can_read(Member.__name__)
 @blueprint.route('<int:member_id>/edit', methods=['GET', 'POST'])
+@authentication.can_read(Member.__name__)
 def member_edit(member_id):
 	editingMember = Member.exists_id(member_id)
 	if editingMember == None:
@@ -106,8 +106,8 @@ def member_edit(member_id):
 	memberForm.email.data = editingMember.email
 	return authentication.auth_render_template('admin/model.html', form=memberForm, type='edit', model=Member, breadcrumbTitle=memberForm.first_name.data, data=editingMember)
 
-@authentication.can_write(Member.__name__)
 @blueprint.route('<int:member_id>/delete', methods=['POST'])
+@authentication.can_write(Member.__name__)
 def member_delete(member_id):
 	editingMember = Member.exists_id(member_id)
 	if editingMember == None:
@@ -120,8 +120,8 @@ def member_delete(member_id):
 	flash('Member Deleted', 'success')
 	return redirect(url_for('member.members_get'))
 
-@authentication.can_read(Member.__name__)
 @blueprint.route('members')
+@authentication.can_read(Member.__name__)
 def members_get():
 	members = Member.query.all()
 	hidden_fields = ['id']

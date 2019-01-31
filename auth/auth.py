@@ -12,7 +12,7 @@ def can_read(model):
 	def outer_decorator(f):
 		@wraps(f)
 		def decorator(*args, **kwargs):
-			user = getCurrentUserType()
+			user = getCurrentUser()
 			if user == None or not user.canRead(model):
 				flash('You do not have access', 'danger')
 				return redirect(url_for('admin.login'))
@@ -25,7 +25,7 @@ def can_write(model):
 	def outer_decorator(f):
 		@wraps(f)
 		def decorator(*args, **kwargs):
-			user = getCurrentUserType()
+			user = getCurrentUser()
 			if user == None or not user.canWrite(model):
 				flash('You do not have access', 'danger')
 				return redirect(url_for('admin.login'))
@@ -56,7 +56,7 @@ def login_required():
 	def outer_decorator(f):
 		@wraps(f)
 		def decorator(*args, **kwargs):
-			if isLoggedIn() == None:
+			if not isLoggedIn():
 				flash('Access Denied', 'danger')
 				return redirect(url_for('admin.login'))
 			else:

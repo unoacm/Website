@@ -90,8 +90,8 @@ def suggestion_new():
 		return redirect(url_for("suggestion.suggestion_new"))
 	return render_template('models/suggestion-form.html', form=suggestionForm, type='new')
 
-@authentication.can_read(Suggestion.__name__)
 @blueprint.route('<int:suggestion_id>/edit', methods=['GET', 'POST'])
+@authentication.can_read(Suggestion.__name__)
 def suggestion_edit(suggestion_id):
 	editingSuggestion = Suggestion.exists_id(suggestion_id)
 	if editingSuggestion == None:
@@ -116,8 +116,8 @@ def suggestion_edit(suggestion_id):
 	suggestionForm.description.data = editingSuggestion.description
 	return authentication.auth_render_template('admin/model.html', form=suggestionForm, type='edit', model=Suggestion, breadcrumbTitle=suggestionForm.title.data, data=editingSuggestion)
 
-@authentication.can_write(Suggestion.__name__)
 @blueprint.route('<int:suggestion_id>/delete', methods=['POST'])
+@authentication.can_write(Suggestion.__name__)
 def suggestion_delete(suggestion_id):
 	editingSuggestion = Suggestion.exists_id(suggestion_id)
 	if editingSuggestion == None:
@@ -130,8 +130,8 @@ def suggestion_delete(suggestion_id):
 	flash('Suggestion Deleted', 'success')
 	return redirect(url_for('suggestion.suggestions_get'))
 
-@authentication.can_read(Suggestion.__name__)
 @blueprint.route('suggestions')
+@authentication.can_read(Suggestion.__name__)
 def suggestions_get():
 	suggestions = Suggestion.query.all()
 	hidden_fields = ['id', 'description']

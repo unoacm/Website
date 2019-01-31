@@ -163,8 +163,8 @@ class UserAction(db.Model):
 
 blueprint = Blueprint('user', __name__, url_prefix='/user')
 
-@authentication.can_write(User.__name__)
 @blueprint.route('/new', methods=['GET', 'POST'])
+@authentication.can_write(User.__name__)
 def user_new():
 	createForm = UserCreateForm()
 	if createForm.validate_on_submit():
@@ -184,8 +184,8 @@ def user_new():
 	
 	return authentication.auth_render_template('admin/model.html', form=createForm, type='new', model=User, breadcrumbTitle='New User')
 
-@authentication.can_read(User.__name__)
 @blueprint.route('/<int:user_id>/edit', methods=['GET', 'POST'])
+@authentication.can_read(User.__name__)
 def user_edit(user_id):
 	editingUser = User.exists_id(user_id)
 	if editingUser == None:
@@ -233,8 +233,8 @@ def user_edit(user_id):
 	editForm.username.data = editingUser.username
 	return authentication.auth_render_template('admin/model.html', form=editForm, type='edit', model=User, breadcrumbTitle=editForm.username.data, data=editingUser, uneditable_data=[('Actions', editingUser.actions, UserAction, ['id', 'user_id'])])
 
-@authentication.can_write(User.__name__)
 @blueprint.route('/<int:user_id>/delete', methods=['POST'])
+@authentication.can_write(User.__name__)
 def user_delete(user_id):
 	editingUser = User.exists_id(user_id)
 	if editingUser == None:
@@ -247,8 +247,8 @@ def user_delete(user_id):
 	flash('User Deleted', 'success')
 	return redirect(url_for('user.users_get'))
 
-@authentication.can_read(User.__name__)
 @blueprint.route('users')
+@authentication.can_read(User.__name__)
 def users_get():
 	users = User.query.all()
 	hidden_fields = ['actions', 'write_access', 'read_access', 'password', 'id']

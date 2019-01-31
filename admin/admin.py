@@ -29,8 +29,8 @@ class UserLoginForm(FlaskForm):
 
 blueprint = Blueprint('admin', __name__, url_prefix='/admin')
 
-@authentication.login_required()
 @blueprint.route('/')
+@authentication.login_required()
 def index():
 	data = collections.OrderedDict()
 	data["AUTHENICATION AND AUTHORIZATION"] = [["Users", user_models.User]]
@@ -41,6 +41,9 @@ def index():
 					]
 	
 	user = authentication.getCurrentUser()
+	if user == None:
+		flash('Access Denied', 'danger')
+		return redirect(url_for('admin.login'))
 	weekAgo = datetime.datetime.now() - datetime.timedelta(days=7)
 	recentActions = user.actions.filter(UserAction.when > weekAgo)
 	return authentication.auth_render_template('admin/index.html', data=data, recentActions=recentActions)
@@ -60,8 +63,8 @@ def login():
 	
 	return render_template('admin/login.html', form=loginForm)
 
-@authentication.login_required()
 @blueprint.route('/logout', methods=['GET'])
+@authentication.login_required()
 def logout():
 	session.clear()
 	return redirect(url_for('admin.login'))

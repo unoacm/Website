@@ -69,8 +69,8 @@ class Document(db.Model):
 
 blueprint = Blueprint('document', __name__, url_prefix='/document')
 
-@authentication.can_write(Document.__name__)
 @blueprint.route('/new', methods=['GET', 'POST'])
+@authentication.can_write(Document.__name__)
 def document_new():
 	documentForm = DocumentForm()
 	if documentForm.validate_on_submit():
@@ -92,8 +92,8 @@ def document_new():
 
 	return authentication.auth_render_template('admin/model.html', form=documentForm, type='new', model=Document, breadcrumbTitle='New Document')
 
-@authentication.can_read(Document.__name__)
 @blueprint.route('/<int:document_id>/edit', methods=['GET', 'POST'])
+@authentication.can_read(Document.__name__)
 def document_edit(document_id):
 	editingDocument = Document.exists_id(document_id)
 	if editingDocument == None:
@@ -126,8 +126,8 @@ def document_edit(document_id):
 	documentForm.document_access.data = editingDocument.document_access
 	return authentication.auth_render_template('admin/model.html', form=documentForm, type='edit', model=Document, breadcrumbTitle=documentForm.title.data, data=editingDocument)
 
-@authentication.can_write(Document.__name__)
 @blueprint.route('/<int:document_id>/delete', methods=['POST'])
+@authentication.can_write(Document.__name__)
 def document_delete(document_id):
 	editingDocument = Document.exists_id(document_id)
 	if editingDocument == None:
@@ -157,8 +157,8 @@ def document_get(document_id):
 			as_attachment = True,
 			attachment_filename=gettingDocument.title + "." + gettingDocument.file_type)
 
-@authentication.can_read(Document.__name__)
 @blueprint.route('documents')
+@authentication.can_read(Document.__name__)
 def documents_get():
 	documents = Document.query.all()
 	hidden_fields = ['id', 'description', 'event_id']
