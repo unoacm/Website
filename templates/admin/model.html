@@ -1,0 +1,129 @@
+{% extends 'admin/base.html' %}
+{% block title %}{% endblock %}
+{% block breadcrumb %}
+	<li class="breadcrumb-item"><a href="{{url_for('admin.index')}}">Home</a></li>
+	<li class="breadcrumb-item"><a href="{{model.getAllRoute()}}">{{model.__name__.capitalize()}}s</a></li>
+	<li class="breadcrumb-item active">{{breadcrumbTitle}}</li>
+{% endblock %}
+{% block content %}
+	<h3 class="text-muted ml-3 d-inline-block">
+		<span id="type">
+			{% if type == 'new' %}
+				Create 
+			{% elif type == 'edit' %}
+				View 
+			{% endif %}
+		</span>
+		{{model.__name__.lower()}}
+	</h3>
+	{% with messages = get_flashed_messages(with_categories=True) %}
+		{% if messages %}
+		<div id="flashes" class="d-inline-block">
+			<span class="alert alert-{{messages[0][0]}} ml-5">
+				{{messages[0][1]}}
+			</span>
+		</div>
+		{% endif %}
+	{% endwith %}
+	{% if user.canWrite(model.__name__) %}
+		<div id="options" class="float-right mr-3">
+			{% if type == 'edit' %}
+				<template id="editOption">
+					<button onclick="edit()" type="button" class="btn btn-warning">
+						Edit <img class="icon ml-1" style="vertical-align: -2px;" src="{{url_for('static', filename='icons/si-glyph-edit.svg')}}" >
+					</button>
+					<button onclick="deleteModel('deleteForm')" class="btn btn-danger">
+						Delete <img class="icon ml-1" style="vertical-align: -3px;" src="{{url_for('static', filename='icons/si-glyph-delete.svg')}}" >
+					</button>
+					<form id="deleteForm" action="{{data.getDeleteRoute()}}" method="POST"></form>
+				</template>
+				<template id="otherOptions">
+					<button type='submit' form="model-form" class='btn btn-success'>
+						Submit <img class="icon ml-1" style="vertical-align: -2px;" src="{{url_for('static', filename='icons/check_circle.svg')}}" >
+					</button>
+					<button onclick='edit()' type='button' class='btn btn-primary'>
+						Cancel <img class="icon ml-1" style="vertical-align: -2px;" src="{{url_for('static', filename='icons/cancel.svg')}}" >
+					</button>
+				</template>
+			{% elif type == 'new' %}
+				<button type='submit' form="model-form" class="btn btn-success">
+					Submit <img class="icon ml-1" style="vertical-align: -2px;" src="{{url_for('static', filename='icons/check_circle.svg')}}" >
+				</button>
+			{% endif %}
+		</div>
+	{% endif %}
+	<div class="border p-3 mx-3 mt-1" id="editArea">
+		<form id="model-form" action="" method="POST" enctype="multipart/form-data">
+			{{form.csrf_token()}}
+			{% for field in form if field.name not in ['csrf_token', 'next'] %}
+				<div class="form-group">
+					<div class="d-inline-block align-top" style="width: 18% !important;">
+						<strong>{{field.label()}}:</strong>
+					</div>
+					<div class="w-25 d-inline-block">
+						{% if field.name == 'file' %}
+							<div class="custom-file">
+								{{field(class_="custom-file-input field", id="validatedCustomFile", disabled=type=='edit')}}
+								<label class="custom-file-label" for="validatedCustomFile">Choose File</label>
+							</div>
+						{% elif field.name == 'picture' %}
+							<div class="custom-file">
+								{{field(class_="custom-file-input field", id="validatedCustomFile" , accept="image/png, image/jpeg, image/jpg, image/gif", disabled=type=='edit')}}
+								<label class="custom-file-label" for="validatedCustomFile">Choose Picture</label>
+							</div>
+						{% elif field.type == 'RadioField' %}
+							{% for subfield in field %}
+								<span class="mr-2">
+									{{subfield(class_="field", disabled=type=='edit')}} {{subfield.label()}}
+								</span>
+							{% endfor %}
+						{% else %}
+							{{field(class_="form-control field", disabled=type=='edit')}}
+						{% endif %}
+					</div>
+					{% if field.description %}
+						<div class="text-muted d-inline-block">
+							<small>{{field.description}}</small>
+						</div>
+					{% endif %}
+				</div>
+			{% endfor %}
+		</form>
+	</div>
+	{% if uneditable_data %}
+		{% for title, unedit_data, unedit_model, hidden_fields in uneditable_data %}
+		<div class="border p-3 mx-3 mt-1 bg-light" id="uneditableArea">
+			<h3 class="text-muted text-center">{{title}}</h3>
+			<table class="ml-0 table table-striped table-hover w-100">
+				<thead>
+					{% for field in unedit_model.__dir__() if field not in hidden_fields %}
+						<th class="p-2 align-middle" scope="col">
+							{{field.replace('_', ' ').upper()}}
+						</th>
+					{% endfor %}
+				</thead>
+				<tbody>
+					{% for datum in unedit_data|sort(attribute='when', reverse=True) %}
+						<tr>
+							{% for field in unedit_model.__dir__() if field not in hidden_fields %}
+								<td>
+									{{datum[field]}}
+								</td>
+							{% endfor %}
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+		{% endfor %}
+	{% endif %}
+{% endblock %}
+{% block footer %}
+	{{super()}}
+	{% if user.canWrite(model.__name__) and type=='edit' %}
+		<script src="{{url_for('static', filename='js/model.js')}}"></script>
+		<script src="{{url_for('static', filename='js/alertFade.js')}}"></script>
+		<script src="{{url_for('static', filename='js/deleteLinks.js')}}"></script>
+	{% endif %}
+	<script src="{{url_for('static', filename='js/file.js')}}"></script>
+{% endblock %}

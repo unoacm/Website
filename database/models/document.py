@@ -1,8 +1,9 @@
 from flask_sqlalchemy import SQLAlchemy
 from database.sqldb import db as db
-from utils.forms import RedirectForm
 import auth.auth as authentication
-import utils.utils as utils
+from flask_wtf import FlaskForm
+from database.models.user import UserAction
+import datetime
 import os
 from wtforms import (
 	StringField, SubmitField, SelectField, FileField
@@ -14,20 +15,18 @@ from flask import (
 	Blueprint, render_template, redirect, url_for, session, flash, send_from_directory
 )
 
-class DocumentForm(RedirectForm):
-	title = StringField("Title: ", validators=[DataRequired()])
-	description = StringField("Description: ", validators=[DataRequired()])
+class DocumentForm(FlaskForm):
+	title = StringField("Title", validators=[DataRequired()])
+	description = StringField("Description", validators=[DataRequired()])
 	document_access = SelectField(
 		'User Access',
 		choices = [(authentication.PUBLIC, 'Public'), (authentication.ADMIN, 'Admin')],
 		validators = [DataRequired()]
 	)
-	file = FileField("Choose File...", validators=[DataRequired()])
-	submit = SubmitField("Submit")
+	file = FileField("File", validators=[DataRequired()])
 
 class DocumentEditForm(DocumentForm):
-	file = FileField()
-	submit = SubmitField("Submit")
+	file = FileField("File", description='If you leave this field blank, it will use the previously saved file.')
 
 class Document(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
@@ -45,11 +44,15 @@ class Document(db.Model):
 
 	@staticmethod
 	def __dir__():
-		return ['id', 'title', 'description', 'document_access', 'file_type']
+		return ['id', 'title', 'description', 'document_access', 'file_type', 'event_id']
 
 	@staticmethod
 	def exists_id(id):
 		return Document.query.filter_by(id=id).first()
+
+	@staticmethod
+	def getAllRoute():
+		return url_for('document.documents_get')
 
 	@staticmethod
 	def getNewRoute():
@@ -66,11 +69,12 @@ class Document(db.Model):
 
 blueprint = Blueprint('document', __name__, url_prefix='/document')
 
+@authentication.can_write(Document.__name__)
 @blueprint.route('/new', methods=['GET', 'POST'])
-@authentication.login_required(authentication.ADMIN)
 def document_new():
 	documentForm = DocumentForm()
 	if documentForm.validate_on_submit():
+		user = authentication.getCurrentUser()
 		fileData = documentForm.file.data
 		title = documentForm.title.data
 		description = documentForm.description.data
@@ -79,23 +83,25 @@ def document_new():
 
 		newDocument = Document(title=title, description=description, document_access=document_access, file_type=file_type)
 		db.session.add(newDocument)
+		user.actions.append(UserAction(model_type=Document.__name__, model_title=title+'.'+file_type, action='Created', when=datetime.datetime.now()))
 		db.session.commit()
 		uploadFile(fileData, newDocument.id)
 
 		flash('Document Created', 'success')
-		return documentForm.redirect(url_for('admin.index'))
+		return redirect(url_for('document.document_edit', document_id=newDocument.id))
 
-	return render_template('models/document-form.html', form=documentForm, type='new')
+	return authentication.auth_render_template('admin/model.html', form=documentForm, type='new', model=Document, breadcrumbTitle='New Document')
 
+@authentication.can_read(Document.__name__)
 @blueprint.route('/<int:document_id>/edit', methods=['GET', 'POST'])
-@authentication.login_required(authentication.ADMIN)
 def document_edit(document_id):
 	editingDocument = Document.exists_id(document_id)
 	if editingDocument == None:
-		return redirect(url_for('admin.index'))
+		return redirect(url_for('document.documents_get'))
 	
 	documentForm = DocumentEditForm()
-	if documentForm.validate_on_submit():
+	if authentication.getCurrentUser().canWrite(Document.__name__) and documentForm.validate_on_submit():
+		user = authentication.getCurrentUser()
 		fileData = documentForm.file.data
 		title = documentForm.title.data
 		description = documentForm.description.data
@@ -110,43 +116,53 @@ def document_edit(document_id):
 		editingDocument.description = description
 		editingDocument.document_access = document_access
 
+		user.actions.append(UserAction(model_type=Document.__name__, model_title=title+'.'+editingDocument.file_type, action='Edited', when=datetime.datetime.now()))
 		db.session.commit()
 		flash('Document Edited', 'success')
-		return documentForm.redirect(url_for('admin.index'))
+		return redirect(url_for('document.document_edit', document_id=editingDocument.id))
 
 	documentForm.title.data = editingDocument.title
 	documentForm.description.data = editingDocument.description
 	documentForm.document_access.data = editingDocument.document_access
-	return render_template('models/document-form.html', form=documentForm, type='edit')
+	return authentication.auth_render_template('admin/model.html', form=documentForm, type='edit', model=Document, breadcrumbTitle=documentForm.title.data, data=editingDocument)
 
+@authentication.can_write(Document.__name__)
 @blueprint.route('/<int:document_id>/delete', methods=['POST'])
-@authentication.login_required(authentication.ADMIN)
 def document_delete(document_id):
 	editingDocument = Document.exists_id(document_id)
 	if editingDocument == None:
-		return redirect(url_for('admin.index'))
+		return redirect(url_for('document.documents_get'))
 
+	user = authentication.getCurrentUser()
 	deleteFile(document_id)
+	user.actions.append(UserAction(model_type=Document.__name__, model_title=editingDocument.title+'.'+editingDocument.file_type, action='Deleted', when=datetime.datetime.now()))
 	db.session.delete(editingDocument)
 	db.session.commit()
 	flash('Document Deleted', 'success')
-	return redirect(utils.get_redirect_url() or url_for('admin.index'))
+	return redirect(url_for('document.documents_get'))
 
 @blueprint.route('/<int:document_id>/')
 def document_get(document_id):
 	from flask import current_app as app
-	user = authentication.getCurrentUserType()
+	user = authentication.getCurrentUser()
 	gettingDocument = Document.query.filter_by(id=document_id).first()
 	if gettingDocument == None:
-		flash('Document Does not Exist')
+		flash('Document does not exist')
 		return redirect(url_for('main.documents'))
-	if authentication.power(user) < authentication.power(gettingDocument.document_access):
+	if not user or not user.canRead(Document.__name__):
 		flash('You do not have permission')
 		return redirect(url_for('main.documents'))
 
 	return send_from_directory(app.config['DOCUMENT_PATH'], str(document_id),
 			as_attachment = True,
 			attachment_filename=gettingDocument.title + "." + gettingDocument.file_type)
+
+@authentication.can_read(Document.__name__)
+@blueprint.route('documents')
+def documents_get():
+	documents = Document.query.all()
+	hidden_fields = ['id', 'description', 'event_id']
+	return authentication.auth_render_template('admin/getAllBase.html', data=documents, model=Document, hidden_fields=hidden_fields)
 
 def getDocumentsByUserType(type):
 	if type == authentication.ADMIN:

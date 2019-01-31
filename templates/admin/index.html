@@ -1,21 +1,52 @@
 {% extends 'admin/base.html' %}
 {% block dashboard_active %}active{% endblock %}
 {% import "main/utils.html" as utils %}
+{% block title %}Admin Page{% endblock %}
 {% block content %}
-	{{super()}}
 	{{utils.flashes()}}
-	<div class="row">
-			{% for header, class, disabled_fields, objs in data %}
-				{% if loop.index != 0 and loop.index % 3 == 0 %}
-					<div class="w-100"></div>
-				{% endif %}
-				<div class="col-md">
-					{{utils.make_model_table(header, class, disabled_fields, objs)}}
-				</div>
-			{% endfor %}
-		</div>
-{% endblock %}
-{% block footer %}
-	{{super()}}
-	<script src="{{url_for('static', filename='js/deleteLinks.js')}}"></script>
+	<div id="database-items" class="float-left">
+		{% for group in data.keys() %}
+			<ul class="list-group database-group">
+				<li class="border-0 list-group-item database-header text-white uppercase">
+					{{group}}
+				</li>
+				{% for item in data[group] %}
+					{% if user.canRead(item[1].__name__) %}
+						<li class="border-top-0 border-right-0 border-left-0 list-group-item database-item">
+							<a href="{{item[1].getAllRoute()}}" class="capitalize">{{item[0]}}</a>
+							{% if user.canWrite(item[1].__name__) %}
+								<div class="float-right">
+									<a href="{{item[1].getNewRoute()}}" class=" add-item">
+										<img class="icon section-add" src="{{url_for('static', filename='icons/si-glyph-plus.svg')}}" >
+										<span class="align-middle">Add</span>
+									</a>
+								</div>
+							{% endif %}
+						</li>
+					{% endif %}
+				{% endfor %}
+			</ul>
+		{% endfor %}
+	</div>
+	<div class="recent-actions recent-actions-index">
+		<h3 class="ml-3 pl-2 pt-3 pr-5">Recent Actions</h3>
+		<hr>
+		<ol>
+			{% if user.actions.all()|length == 0 %}
+				<li>
+					No recent actions
+				</li>
+			{% else %}
+				{% for action in recentActions|sort(attribute='when', reverse=True) %}
+					{% if loop.index <= 12 %}
+						<li>
+							<div>
+								{{action.action}} {{action.model_type}}: {{action.model_title}} | <span class="text-muted"><small>{{action.when.date()}}</small></span>
+							</div>
+						</li>
+					{% endif %}
+				{% endfor %}
+			{% endif %}
+		</ol>
+	</div>
 {% endblock %}

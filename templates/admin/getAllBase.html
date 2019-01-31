@@ -1,0 +1,98 @@
+{% extends 'admin/base.html' %}
+{% block dashboard_active %}active{% endblock %}
+{% import "main/utils.html" as utils %}
+{% block title %}{{model.__name__.capitalize()}}s{% endblock %}
+{% block breadcrumb %}
+	<li class="breadcrumb-item"><a href="{{url_for('admin.index')}}">Home</a></li>
+	<li class="breadcrumb-item active">{{model.__name__.capitalize()}}s</li>
+{% endblock %}
+{% block content %}
+	<div class="ml-2">
+		<h4 class="d-inline-block text-muted">Select {{model.__name__.lower()}} to change</h4>
+		{% with messages = get_flashed_messages(with_categories=True) %}
+			{% if messages %}
+			<div id="flashes" class="d-inline-block">
+				<span class="alert alert-{{messages[0][0]}} ml-5">
+					{{messages[0][1]}}
+				</span>
+			</div>
+			{% endif %}
+		{% endwith %}
+		{% if user.canWrite(model.__name__) %}
+		<a href="{{model.getNewRoute()}}" class="badge badge-secondary float-right p-2 mr-1 text-white">
+			ADD {{model.__name__.upper()}}
+			<img class="icon align-bottom ml-1" src="{{url_for('static', filename='icons/si-glyph-plus.svg')}}" >
+		</a>
+		{% endif %}
+	</div>
+	<div>
+		<div class="ml-2 my-4 py-2 d-flex flex-row bg-light w-100">
+			<img class="ml-1" src="{{url_for('static', filename='icons/search.svg')}}" >
+			<div class="input-group input-group-sm d-inline-block">
+				<input type="text" class="form-control d-inline-block w-50 rounded-pill">
+				<button class="btn btn-outline-secondary btn-sm">Search</button>
+			</div>
+		</div>
+		<div class="text-muted d-flex flex-row ml-4 mb-3 w-50">
+			<div class="text-muted input-group w-75" id="action-select-group">
+				<label for="action-select">Action:</label>
+				<select class="ml-2 custom-select rounded mr-2" id="action-select">
+					<option selected>---------</option>
+				</select>
+				<button class="btn btn-outline-secondary btn-sm mr-2">Go</button>
+			</div>
+			<span id="selected-amount">0 of {{data|length}} selected</span>
+		</div>
+		<table class="ml-3 table table-striped table-hover" id="model-table">
+			<thead>
+				<tr>
+					<th>
+						<div class="checkbox">
+							<input type="checkbox" id="checkbox-main">
+							<label for="checkbox-main"></label>
+						</div>
+					</th>
+					{% for field in model.__dir__() if field not in hidden_fields %}
+						<th class="p-2 align-middle" scope="col">
+							{{field.replace('_', ' ').upper()}}
+						</th>
+					{% endfor %}
+				</tr>
+			</thead>
+			<tbody>
+				{% for datum in data %}
+					{% set firstFound = {'found': True} %}
+					<tr>
+						<td>
+							<div class="checkbox">
+								<input type="checkbox" id="checkbox-{{datum['id']}}">
+								<label for="checkbox-{{datum['id']}}"></label>
+							</div>
+						</td>
+						{% for field in model.__dir__() if field not in hidden_fields %}
+							<td class="align-middle">
+								{% if firstFound.found %}
+									<a href="{{datum.getEditRoute()}}">
+								{% endif %}
+								{{datum[field]}}
+								{% if firstFound.update({'found': False}) %}
+									</a>
+								{% endif %}
+							</td>
+						{% endfor %}
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+		<div class="ml-4 text-muted">
+			{{data|length}} {{model.__name__.lower()}}{% if data|length != 1 %}s{% endif %}
+		</div>
+		<div id="model-count-line" class="ml-3">
+			<hr>
+		</div>
+	</div>
+{% endblock %}
+{% block footer %}
+	{{super()}}
+	<script src="{{url_for('static', filename='js/alertFade.js')}}"></script>
+{% endblock %}

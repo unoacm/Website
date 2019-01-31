@@ -1,8 +1,9 @@
 from flask_sqlalchemy import SQLAlchemy
 from database.sqldb import db as db
-from utils.forms import RedirectForm
+from flask_wtf import FlaskForm
 import auth.auth as authentication
-import utils.utils as utils
+from database.models.user import UserAction
+import datetime
 from wtforms import (
 	StringField, SubmitField, PasswordField
 )
@@ -13,11 +14,10 @@ from flask import (
 	Blueprint, render_template, redirect, url_for, session, flash, 
 )
 
-class MemberCreateForm(RedirectForm):
-	first_name = StringField("First Name: ", validators=[DataRequired()])
-	last_name = StringField("Last Name: ", validators=[DataRequired()])
-	email = StringField("Email: ")
-	submit = SubmitField("Submit")
+class MemberCreateForm(FlaskForm):
+	first_name = StringField("First Name", validators=[DataRequired()])
+	last_name = StringField("Last Name", validators=[DataRequired()])
+	email = StringField("Email")
 
 class Member(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
@@ -42,6 +42,10 @@ class Member(db.Model):
 	def getNewRoute():
 		return url_for('member.member_new')
 	
+	@staticmethod
+	def getAllRoute():
+		return url_for('member.members_get')
+	
 	def getEditRoute(self):
 		return url_for('member.member_edit', member_id=self.id)
 
@@ -50,11 +54,12 @@ class Member(db.Model):
 
 blueprint = Blueprint('member', __name__, url_prefix='/member')
 
+@authentication.can_write(Member.__name__)
 @blueprint.route('/new', methods=['GET', 'POST'])
-@authentication.login_required(authentication.ADMIN)
 def member_new():
 	memberForm = MemberCreateForm()
 	if memberForm.validate_on_submit():
+		user = authentication.getCurrentUser()
 		first_name = memberForm.first_name.data
 		last_name = memberForm.last_name.data
 		if memberForm.email.data == "":
@@ -64,21 +69,24 @@ def member_new():
 
 		newMember = Member(first_name=first_name, last_name=last_name, email=email)
 		db.session.add(newMember)
+		user.actions.append(UserAction(model_type=Member.__name__, model_title=first_name+' '+last_name, action='Created', when=datetime.datetime.now()))
 		db.session.commit()
 		flash('Member Created', 'success')
-		return memberForm.redirect(url_for('admin.index'))
+		return redirect(url_for('member.member_edit', member_id=newMember.id))
 	
-	return render_template('models/member-form.html', form=memberForm, type='new')
+	return authentication.auth_render_template('admin/model.html', form=memberForm, type='new', model=Member, breadcrumbTitle='New Member')
 
+@authentication.can_read(Member.__name__)
 @blueprint.route('<int:member_id>/edit', methods=['GET', 'POST'])
-@authentication.login_required(authentication.ADMIN)
 def member_edit(member_id):
 	editingMember = Member.exists_id(member_id)
 	if editingMember == None:
-		return redirect(url_for('admin.index'))
+		flash('Member does not exist', 'danger')
+		return redirect(url_for('member.members_get'))
 
 	memberForm = MemberCreateForm()
-	if memberForm.validate_on_submit():
+	if authentication.getCurrentUser().canWrite(Member.__name__) and memberForm.validate_on_submit():
+		user = authentication.getCurrentUser()
 		first_name = memberForm.first_name.data
 		last_name = memberForm.last_name.data
 		if memberForm.email.data == "":
@@ -88,22 +96,33 @@ def member_edit(member_id):
 		editingMember.first_name = first_name
 		editingMember.last_name = last_name
 		editingMember.email = email
+		user.actions.append(UserAction(model_type=Member.__name__, model_title=first_name+' '+last_name, action='Edited', when=datetime.datetime.now()))
 		db.session.commit()
 		flash('Member edited', 'success')
-		return memberForm.redirect('admin.index')
+		return redirect(url_for('member.member_edit', member_id=editingMember.id))
 
 	memberForm.first_name.data = editingMember.first_name
 	memberForm.last_name.data = editingMember.last_name
 	memberForm.email.data = editingMember.email
-	return render_template('models/member-form.html', form=memberForm, type='edit')
+	return authentication.auth_render_template('admin/model.html', form=memberForm, type='edit', model=Member, breadcrumbTitle=memberForm.first_name.data, data=editingMember)
 
+@authentication.can_write(Member.__name__)
 @blueprint.route('<int:member_id>/delete', methods=['POST'])
-@authentication.login_required(authentication.ADMIN)
 def member_delete(member_id):
 	editingMember = Member.exists_id(member_id)
 	if editingMember == None:
-		return redirect(url_for('admin.index'))
+		flash('Member does not exist', 'danger')
+		return redirect(url_for('member.members_get'))
+	user = authentication.getCurrentUser()
+	user.actions.append(UserAction(model_type=Member.__name__, model_title=editingMember.first_name+' '+editingMember.last_name, action='Deleted', when=datetime.datetime.now()))
 	Member.query.filter_by(id=member_id).delete()
 	db.session.commit()
 	flash('Member Deleted', 'success')
-	return redirect(url_for('admin.index'))
+	return redirect(url_for('member.members_get'))
+
+@authentication.can_read(Member.__name__)
+@blueprint.route('members')
+def members_get():
+	members = Member.query.all()
+	hidden_fields = ['id']
+	return authentication.auth_render_template('admin/getAllBase.html', data=members, model=Member, hidden_fields=hidden_fields)

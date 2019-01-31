@@ -10,8 +10,9 @@ from wtforms.validators import (
 from werkzeug.security import (
 	generate_password_hash
 )
-from utils.forms import RedirectForm
+from flask_wtf import FlaskForm
 from database.sqldb import db as db
+from database.models.user import UserAction
 import database.sqldb as sqldb
 import auth.auth as authentication
 import database.models.user as user_models
@@ -19,71 +20,48 @@ import database.models.suggestion as suggestion_models
 import database.models.member as member_models
 import database.models.document as document_models
 import database.models.event as event_models
-import utils.utils as utils
-import datetime
+import datetime, collections
 
-class AdminLoginForm(RedirectForm):
+class UserLoginForm(FlaskForm):
 	username = StringField("Username: ", validators=[DataRequired()])
 	password = PasswordField("Password: ", validators=[DataRequired()])
 	submit = SubmitField("Login")
 
 blueprint = Blueprint('admin', __name__, url_prefix='/admin')
 
+@authentication.login_required()
 @blueprint.route('/')
-@authentication.login_required('admin')
 def index():
-	users = user_models.User.query.all()
-	members = member_models.Member.query.all()
-	suggestions = suggestion_models.Suggestion.query.all()
-	documents = document_models.Document.query.all()
-	events = event_models.Event.query.all()
-	data = [
-		["Users", user_models.User, ['password'], users],
-		["Members", member_models.Member, [], members],
-		["Suggestions", suggestion_models.Suggestion, ['description'], suggestions],
-		["Documents", document_models.Document, ['description'], documents],
-		['Events', event_models.Event, ['description', 'date', 'start_time', 'end_time', 'location', 'picture_type'], events]
-	]
-	return render_template('admin/index.html', data=data)
-
-@blueprint.route('/members')
-@authentication.login_required(authentication.ADMIN)
-def members():
-	members = member_models.Member.query.all()
-	return render_template('admin/members.html', classType=member_models.Member, disabled_fields=[], data=members)
-
-@blueprint.route('/events')
-@authentication.login_required(authentication.ADMIN)
-def events():
-	events = event_models.Event.query.order_by(event_models.Event.end_date.desc()).all()
-	today = datetime.date.today()
-	events_coming = event_models.Event.query.filter(event_models.Event.end_date > today).filter(event_models.Event.start_date > today).all()
-	events_past = event_models.Event.query.filter(event_models.Event.end_date < today).all()
-	return render_template('admin/events.html', data=events, events_coming=events_coming, events_past=events_past)
-
-@blueprint.route('/suggestions')
-@authentication.login_required(authentication.ADMIN)
-def suggestions():
-	suggestions = suggestion_models.Suggestion.query.all()
-	return render_template('admin/suggestions.html', data=suggestions)
+	data = collections.OrderedDict()
+	data["AUTHENICATION AND AUTHORIZATION"] = [["Users", user_models.User]]
+	data["OTHER"] = [["Members", member_models.Member],
+					 ["Suggestions", suggestion_models.Suggestion],
+					 ["Documents", document_models.Document],
+					 ["Events", event_models.Event]
+					]
+	
+	user = authentication.getCurrentUser()
+	weekAgo = datetime.datetime.now() - datetime.timedelta(days=7)
+	recentActions = user.actions.filter(UserAction.when > weekAgo)
+	return authentication.auth_render_template('admin/index.html', data=data, recentActions=recentActions)
 
 @blueprint.route('/login', methods=['GET', 'POST'])
 def login():
-	if authentication.isLoggedIn(authentication.ADMIN):
+	if authentication.isLoggedIn():
 		return redirect(url_for('admin.index'))
 
-	loginForm = AdminLoginForm()
+	loginForm = UserLoginForm()
 	if loginForm.validate_on_submit():
 		username = loginForm.username.data
 		password = loginForm.password.data
-		if authentication.login(username, password, authentication.ADMIN):
+		if authentication.login(username, password):
 			return redirect(url_for('admin.index'))
 		flash('Invalid Credentials', 'danger')
 	
 	return render_template('admin/login.html', form=loginForm)
 
+@authentication.login_required()
 @blueprint.route('/logout', methods=['GET'])
-@authentication.login_required(authentication.ADMIN)
 def logout():
-	session[authentication.SESSION_USER] = (authentication.PUBLIC, None)
+	session.clear()
 	return redirect(url_for('admin.login'))

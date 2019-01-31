@@ -68,31 +68,6 @@ html, body
 	list-style: none;
 }
 
-#admin-nav
-{
-	margin-bottom: 30px;
-}
-
-.section
-{
-	margin-top: 20px;
-	margin-left: 10px;
-	margin-right: 10px;
-	overflow: auto;
-	max-height: 350px;
-}
-
-.section-header
-{
-	margin-top: 10px;
-	margin-bottom: 0px;
-}
-
-.section-add
-{
-	margin-left: 20px;
-}
-
 table
 {
 	margin-left: 10px;
@@ -108,7 +83,7 @@ table
 
 .icon
 {
-	width: 20px;
+	width: 15px;
 	height: auto;
 	vertical-align: middle;
 }

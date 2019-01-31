@@ -1,0 +1,107 @@
+#userType
+{
+	color: #f4ff82;
+}
+
+#admin-brand
+{
+	color: #ffe563;
+	font-size: 2em;
+}
+
+#database-items
+{
+	margin-left: 7%;
+	width: 40%;
+}
+
+.database-header
+{
+	background-color: #4287ee;
+}
+
+.database-item
+{
+	margin: 0;
+}
+
+a, a:hover
+{
+	text-decoration: none;
+}
+
+#model-table
+{
+	width: 75%;
+}
+
+#model-count-line
+{
+	width: 75%;
+}
+
+input[type=checkbox] + label
+{
+	margin: 0.2em;
+	cursor: pointer;
+	padding: 0.2em;
+}
+
+input[type=checkbox]
+{
+	display: none;
+}
+
+input[type=checkbox] + label:before
+{
+	content: "\2714";
+	border: 0.1em solid #000;
+	border-radius: 0.2em;
+	display: inline-block;
+	width: 1em;
+	height: 1em;
+	vertical-align: -5px;
+	color: transparent;
+	transition: .2s;
+}
+
+input[type=checkbox] + label:active:before
+{
+	transform: scale(0);
+}
+
+input[type=checkbox]:checked + label:before
+{
+	background-color: MediumSeaGreen;
+	border-color: MediumSeaGreen;
+	color: #fff;
+}
+
+#model-table tbody tr:last-child
+{
+	border-bottom: 2px solid gray;
+}
+
+#action-select
+{
+	height: 30px;
+}
+
+.recent-actions
+{
+	float: right;
+	background-color: rgb(237, 241, 249);
+	border-radius: 10px;
+}
+
+.recent-actions-index
+{
+	margin-right: 5%;
+	margin-top: 1%;
+	width: 40%;
+}
+
+.recent-actions ol
+{
+	list-style: none;
+}

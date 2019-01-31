@@ -50,9 +50,9 @@ if not os.environ.get('FLASK_ADMIN_USERNAME'):
 		raise ValueError('FLASK_ADMIN_USERNAME not set')
 if not os.environ.get('FLASK_ADMIN_PASSWORD'):
 	raise ValueError('FLASK_ADMIN_PASSWORD not set')
-default_admin = user_models.User.query.filter_by(user_type=authentication.ADMIN, username=os.environ['FLASK_ADMIN_USERNAME']).first()
+default_admin = user_models.User.query.filter_by(username=os.environ['FLASK_ADMIN_USERNAME']).first()
 if not default_admin:
-	admin = user_models.User(username=os.environ['FLASK_ADMIN_USERNAME'], password=os.environ['FLASK_ADMIN_PASSWORD'], user_type=authentication.ADMIN)
+	admin = user_models.User(username=os.environ['FLASK_ADMIN_USERNAME'], password=os.environ['FLASK_ADMIN_PASSWORD'], write_access='all')
 	db.session.add(admin)
 	db.session.commit()
 

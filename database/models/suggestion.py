@@ -9,16 +9,22 @@ from wtforms.validators import (
 )
 import auth.auth as authentication
 from database.sqldb import db as db
-from utils.forms import RedirectForm
-import utils.utils as utils
+from flask_wtf import FlaskForm
+from database.models.user import UserAction
 import datetime
 
-class SuggestionForm(RedirectForm):
+class SuggestionForm(FlaskForm):
 	first_name = StringField("First Name: ")
 	last_name = StringField("Last Name: ")
 	title = StringField("Title: ", validators=[DataRequired()])
 	description = TextAreaField("Suggestion: ", validators=[DataRequired()])
 	submit = SubmitField("Submit")
+
+class EditSuggestionForm(FlaskForm):
+	first_name = StringField("First Name")
+	last_name = StringField("Last Name")
+	title = StringField("Title", validators=[DataRequired()])
+	description = TextAreaField("Suggestion", validators=[DataRequired()])
 
 class Suggestion(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
@@ -44,6 +50,10 @@ class Suggestion(db.Model):
 		return Suggestion.query.filter_by(id=id).first()
 
 	@staticmethod
+	def getAllRoute():
+		return url_for('suggestion.suggestions_get')
+
+	@staticmethod
 	def getNewRoute():
 		return url_for('suggestion.suggestion_new')
 	
@@ -62,6 +72,7 @@ blueprint = Blueprint('suggestion', __name__, url_prefix='/suggestion')
 def suggestion_new():
 	suggestionForm = SuggestionForm()
 	if suggestionForm.validate_on_submit():
+		user = authentication.getCurrentUser()
 		first_name = suggestionForm.first_name.data
 		if first_name == '':
 			first_name = None
@@ -71,53 +82,57 @@ def suggestion_new():
 		title = suggestionForm.title.data
 		description = suggestionForm.description.data
 		suggestion = Suggestion(first_name=first_name, last_name=last_name, title=title, description=description)
+		if user != None:
+			user.actions.append(UserAction(model_type=Suggestion.__name__, model_title=title, action='Created', when=datetime.datetime.now()))
 		db.session.add(suggestion)
 		db.session.commit()
 		flash('Suggestion Submitted', 'success')
-		if authentication.isLoggedIn('admin'):
-			return suggestionForm.redirect(url_for('suggestion.suggestion_new'))
 		return redirect(url_for("suggestion.suggestion_new"))
 	return render_template('models/suggestion-form.html', form=suggestionForm, type='new')
 
+@authentication.can_read(Suggestion.__name__)
 @blueprint.route('<int:suggestion_id>/edit', methods=['GET', 'POST'])
-@authentication.login_required(authentication.ADMIN)
 def suggestion_edit(suggestion_id):
 	editingSuggestion = Suggestion.exists_id(suggestion_id)
 	if editingSuggestion == None:
-		return utils.redirect('admin.index')
+		flash('Suggestion does not exist', 'danger')
+		return redirect(url_for('suggestion.suggestions_get'))
 	
-	suggestionForm = SuggestionForm()
-	if suggestionForm.validate_on_submit():
+	suggestionForm = EditSuggestionForm()
+	if authentication.getCurrentUser().canWrite(Suggestion.__name__) and suggestionForm.validate_on_submit():
+		user = authentication.getCurrentUser()
 		editingSuggestion.first_name = None if suggestionForm.first_name.data == '' else suggestionForm.first_name.data
 		editingSuggestion.last_name = None if suggestionForm.last_name.data == '' else suggestionForm.last_name.data
 		editingSuggestion.title = suggestionForm.title.data
 		editingSuggestion.description = suggestionForm.description.data
+		user.actions.append(UserAction(model_type=Suggestion.__name__, model_title=editingSuggestion.title, action='Edited', when=datetime.datetime.now()))
 		db.session.commit()
 		flash('Suggestion Edited', 'success')
-		return suggestionForm.redirect(url_for('admin.index'))
+		return redirect(url_for('suggestion.suggestion_edit', suggestion_id=editingSuggestion))
 	
 	suggestionForm.first_name.data = editingSuggestion.first_name
 	suggestionForm.last_name.data = editingSuggestion.last_name
 	suggestionForm.title.data = editingSuggestion.title
 	suggestionForm.description.data = editingSuggestion.description
-	return render_template('models/suggestion-form.html', form=suggestionForm)
+	return authentication.auth_render_template('admin/model.html', form=suggestionForm, type='edit', model=Suggestion, breadcrumbTitle=suggestionForm.title.data, data=editingSuggestion)
 
+@authentication.can_write(Suggestion.__name__)
 @blueprint.route('<int:suggestion_id>/delete', methods=['POST'])
-@authentication.login_required(authentication.ADMIN)
 def suggestion_delete(suggestion_id):
 	editingSuggestion = Suggestion.exists_id(suggestion_id)
 	if editingSuggestion == None:
-		return redirect(url_for('admin.index'))
+		flash('Suggestion does not exist', 'danger')
+		return redirect(url_for('suggestion.suggestions_get'))
+	user = authentication.getCurrentUser()
+	user.actions.append(UserAction(model_type=Suggestion.__name__, model_title=editingSuggestion.title, action='Deleted', when=datetime.datetime.now()))
 	Suggestion.query.filter_by(id=suggestion_id).delete()
 	db.session.commit()
 	flash('Suggestion Deleted', 'success')
-	return redirect(utils.get_redirect_url() or url_for('admin.index'))
+	return redirect(url_for('suggestion.suggestions_get'))
 
-@blueprint.route('/<int:suggestion_id>')
-@authentication.login_required(authentication.ADMIN)
-def suggestion_get(suggestion_id):
-	currentSuggestion = Suggestion.exists_id(suggestion_id)
-	if currentSuggestion == None:
-		return redirect(url_for('admin.suggestions'))
-	
-	return render_template('admin/suggestion.html', data=currentSuggestion)
+@authentication.can_read(Suggestion.__name__)
+@blueprint.route('suggestions')
+def suggestions_get():
+	suggestions = Suggestion.query.all()
+	hidden_fields = ['id', 'description']
+	return authentication.auth_render_template('admin/getAllBase.html', data=suggestions, model=Suggestion, hidden_fields=hidden_fields)
