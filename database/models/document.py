@@ -169,7 +169,7 @@ def getDocumentsByUserType(type):
 	docs = []
 	if type == authentication.ADMIN and authentication.getCurrentUser().canRead(Document.__name__):
 		docs = Document.query.order_by(Document.title).all()
-	elif type == authentication.PUBLIC:
+	else:
 		docs = Document.query.order_by(Document.title).filter_by(document_access=authentication.PUBLIC).all()
 	return docs
 

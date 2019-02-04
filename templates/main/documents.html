@@ -41,7 +41,7 @@
 							<div class="p-1 justify-content-start">
 								<a href="{{doc.getGetRoute()}}" class="btn btn-primary">Download</a>
 							</div>
-							{% if doc.document_access == 'admin' and user and user.canRead('Document') %}
+							{% if user and user.canRead('Document') %}
 								<div class="p-1 justify-content-end">
 									<a class="btn btn-warning" href="{{doc.getEditRoute()}}">Edit</a>
 								</div>
