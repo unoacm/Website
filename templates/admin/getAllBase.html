@@ -19,18 +19,18 @@
 			{% endif %}
 		{% endwith %}
 		{% if user.canWrite(model.__name__) %}
-		<a href="{{model.getNewRoute()}}" class="badge badge-secondary float-right p-2 mr-1 text-white">
-			ADD {{model.__name__.upper()}}
-			<img class="icon align-bottom ml-1" src="{{url_for('static', filename='icons/si-glyph-plus.svg')}}" >
-		</a>
+			<a href="{{model.getNewRoute()}}" class="badge badge-secondary float-right p-2 mr-1 text-white">
+				ADD {{model.__name__.upper()}}
+				<img class="icon align-bottom ml-1" src="{{url_for('static', filename='icons/si-glyph-plus.svg')}}" >
+			</a>
 		{% endif %}
 	</div>
 	<div>
 		<div class="ml-2 my-4 py-2 d-flex flex-row bg-light w-100">
 			<img class="ml-1" src="{{url_for('static', filename='icons/search.svg')}}" >
 			<div class="input-group input-group-sm d-inline-block">
-				<input type="text" class="form-control d-inline-block w-50 rounded-pill">
-				<button class="btn btn-outline-secondary btn-sm">Search</button>
+				<input id="search" type="text" class="form-control d-inline-block w-50 rounded-pill">
+				<button type="button" onclick="search('search')" class="btn btn-outline-secondary btn-sm">Search</button>
 			</div>
 		</div>
 		<div class="text-muted d-flex flex-row ml-4 mb-3 w-50">
@@ -41,14 +41,14 @@
 				</select>
 				<button class="btn btn-outline-secondary btn-sm mr-2">Go</button>
 			</div>
-			<span id="selected-amount">0 of {{data|length}} selected</span>
+			<span><span id="selectedAmount">0</span> of <span id="maxAmount">{{data|length}}</span> selected</span>
 		</div>
 		<table class="ml-3 table table-striped table-hover" id="model-table">
 			<thead>
 				<tr>
 					<th>
 						<div class="checkbox">
-							<input type="checkbox" id="checkbox-main">
+							<input type="checkbox" id="checkbox-main" onchange="mainCheckboxChange(this)">
 							<label for="checkbox-main"></label>
 						</div>
 					</th>
@@ -65,7 +65,7 @@
 					<tr>
 						<td>
 							<div class="checkbox">
-								<input type="checkbox" id="checkbox-{{datum['id']}}">
+								<input type="checkbox" id="checkbox-{{datum['id']}}" onchange="checkboxChange(this)">
 								<label for="checkbox-{{datum['id']}}"></label>
 							</div>
 						</td>
@@ -85,7 +85,7 @@
 			</tbody>
 		</table>
 		<div class="ml-4 text-muted">
-			{{data|length}} {{model.__name__.lower()}}{% if data|length != 1 %}s{% endif %}
+			<span id="amount">{{data|length}}</span> {{model.__name__.lower()}}{% if data|length != 1 %}s{% endif %}
 		</div>
 		<div id="model-count-line" class="ml-3">
 			<hr>
@@ -95,4 +95,5 @@
 {% block footer %}
 	{{super()}}
 	<script src="{{url_for('static', filename='js/alertFade.js')}}"></script>
+	<script src="{{url_for('static', filename='js/getAllModel.js')}}"></script>
 {% endblock %}

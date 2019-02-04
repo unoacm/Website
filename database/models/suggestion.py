@@ -43,7 +43,7 @@ class Suggestion(db.Model):
 
 	@staticmethod
 	def __dir__():
-		return ['id', 'first_name', 'last_name', 'title', 'description']
+		return ['id', 'first_name', 'last_name', 'title', 'description', 'date']
 
 	@staticmethod
 	def exists_id(id):
@@ -62,9 +62,6 @@ class Suggestion(db.Model):
 
 	def getDeleteRoute(self):
 		return url_for('suggestion.suggestion_delete', suggestion_id=self.id)
-
-	def getGetRoute(self):
-		return url_for('suggestion.suggestion_get', suggestion_id=self.id)
 
 blueprint = Blueprint('suggestion', __name__, url_prefix='/suggestion')
 
@@ -114,7 +111,7 @@ def suggestion_edit(suggestion_id):
 	suggestionForm.last_name.data = editingSuggestion.last_name
 	suggestionForm.title.data = editingSuggestion.title
 	suggestionForm.description.data = editingSuggestion.description
-	return authentication.auth_render_template('admin/model.html', form=suggestionForm, type='edit', model=Suggestion, breadcrumbTitle=suggestionForm.title.data, data=editingSuggestion)
+	return authentication.auth_render_template('admin/model.html', form=suggestionForm, type='edit', model=Suggestion, breadcrumbTitle=suggestionForm.title.data, data=editingSuggestion, uneditable_fields=[('Date', editingSuggestion.date)])
 
 @blueprint.route('<int:suggestion_id>/delete', methods=['POST'])
 @authentication.can_write(Suggestion.__name__)

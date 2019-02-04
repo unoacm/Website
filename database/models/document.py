@@ -149,9 +149,10 @@ def document_get(document_id):
 	if gettingDocument == None:
 		flash('Document does not exist')
 		return redirect(url_for('main.documents'))
-	if not user or not user.canRead(Document.__name__):
-		flash('You do not have permission')
-		return redirect(url_for('main.documents'))
+	if gettingDocument.document_access == authentication.ADMIN:
+		if user == None or not user.canRead(Document.__name__):
+			flash('You do not have permission', 'danger')
+			return redirect(url_for('main.documents'))
 
 	return send_from_directory(app.config['DOCUMENT_PATH'], str(document_id),
 			as_attachment = True,
@@ -165,7 +166,8 @@ def documents_get():
 	return authentication.auth_render_template('admin/getAllBase.html', data=documents, model=Document, hidden_fields=hidden_fields)
 
 def getDocumentsByUserType(type):
-	if type == authentication.ADMIN:
+	docs = []
+	if type == authentication.ADMIN and authentication.getCurrentUser().canRead(Document.__name__):
 		docs = Document.query.order_by(Document.title).all()
 	elif type == authentication.PUBLIC:
 		docs = Document.query.order_by(Document.title).filter_by(document_access=authentication.PUBLIC).all()

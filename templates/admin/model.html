@@ -88,6 +88,16 @@
 					{% endif %}
 				</div>
 			{% endfor %}
+			{% if uneditable_fields %}
+				{% for label, unedit_data in uneditable_fields %}
+					<div class="d-inline-block align-top" style="width: 18% !important;">
+						<strong>{{label}}:</strong>
+					</div>
+					<div class="w-25 d-inline-block">
+						{{unedit_data}}
+					</div>
+				{% endfor %}
+			{% endif %}
 		</form>
 	</div>
 	{% if uneditable_data %}

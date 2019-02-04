@@ -11,11 +11,6 @@
 	{{super()}}
 	{{utils.flashes()}}
 	<h1 class="heading d-inline-block">Documents</h1>
-	{% if session['user'] and session['user'][0] == 'admin' %}
-		<nav class="nav d-inline-block">
-			<a class="nav-link" href="{{url_for('document.document_new')}}"><img class="icon section-add" src="{{url_for('static', filename='icons/si-glyph-plus.svg')}}" ></a>
-		</nav>
-	{% endif %}
 	<hr>
 	{% if docs|length == 0 %}
 		<div class="jumbotron jumbotron-fluid">
@@ -46,15 +41,17 @@
 							<div class="p-1 justify-content-start">
 								<a href="{{doc.getGetRoute()}}" class="btn btn-primary">Download</a>
 							</div>
-							{% if session['user'] and session['user'][0] == 'admin' %}
+							{% if doc.document_access == 'admin' and user and user.canRead('Document') %}
 								<div class="p-1 justify-content-end">
 									<a class="btn btn-warning" href="{{doc.getEditRoute()}}">Edit</a>
 								</div>
-								<div class="p-1 justify-content-end">
-									<form action="{{doc.getDeleteRoute()}}" method="POST">
-										<button value="submit" class="btn btn-danger delete-confirm">Delete</button>
-									</form>
-								</div>
+								{% if user.canWrite('Document') %}
+									<div class="p-1 justify-content-end">
+										<form action="{{doc.getDeleteRoute()}}" method="POST" id="deleteForm">
+											<button onclick="deleteModel('deleteForm')" class="btn btn-danger delete-confirm">Delete</button>
+										</form>
+									</div>
+								{% endif %}
 							{% endif %}
 						</div>
 					</div>

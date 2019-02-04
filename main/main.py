@@ -43,11 +43,11 @@ def documents_page(page):
 	
 	if len(docs) == 0 and page != 1 or max(1, math.ceil(len(docs) / MAX_DOCUMENT_PER_PAGE)) < page:
 		return redirect(url_for('main.documents_page', page=1))
-	return render_template(
+	return authentication.auth_render_template(
 		'main/documents.html',
 		docs=docs[((page - 1) * MAX_DOCUMENT_PER_PAGE):MAX_DOCUMENT_PER_PAGE * page],
 		page=page,
 		maxPages= max(math.ceil(len(docs)/MAX_DOCUMENT_PER_PAGE), 1),
 		per_row=DOCUMENTS_PER_ROW,
-		per_page=MAX_DOCUMENT_PER_PAGE
+		per_page=MAX_DOCUMENT_PER_PAGE,
 	)
