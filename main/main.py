@@ -8,8 +8,8 @@ import math, datetime
 
 blueprint = Blueprint('main', __name__, url_prefix='/')
 
-DOCUMENTS_PER_ROW = 3
-MAX_DOCUMENT_PER_PAGE  = 9
+DOCUMENTS_PER_ROW		= 3
+MAX_DOCUMENT_PER_PAGE 	= 9
 
 @blueprint.route('/')
 def index():

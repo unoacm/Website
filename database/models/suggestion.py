@@ -108,7 +108,6 @@ def suggestion_edit(suggestion_id):
 			user.actions.append(UserAction(model_type=Suggestion.__name__, model_title=editingSuggestion.title, action='Edited', when=datetime.datetime.now()))
 			db.session.commit()
 			flash('Suggestion Edited', 'success')
-			return redirect(editingSuggestion.getEditRoute())
 	
 	suggestionForm.first_name.data 	= editingSuggestion.first_name
 	suggestionForm.last_name.data 	= editingSuggestion.last_name
