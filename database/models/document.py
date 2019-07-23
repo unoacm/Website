@@ -12,16 +12,16 @@ from wtforms.validators import (
 	DataRequired
 )
 from flask import (
-	Blueprint, render_template, redirect, url_for, session, flash, send_from_directory
+	Blueprint, render_template, redirect, url_for, session, flash, send_from_directory, request
 )
 
 class DocumentForm(FlaskForm):
-	title = StringField("Title", validators=[DataRequired()])
-	description = StringField("Description", validators=[DataRequired()])
+	title 			= StringField("Title", validators=[DataRequired()])
+	description 	= StringField("Description", validators=[DataRequired()])
 	document_access = SelectField(
 		'User Access',
-		choices = [(authentication.PUBLIC, 'Public'), (authentication.ADMIN, 'Admin')],
-		validators = [DataRequired()]
+		choices 	= [(authentication.PUBLIC, 'Public'), (authentication.ADMIN, 'Private')],
+		validators 	= [DataRequired()]
 	)
 	file = FileField("File", validators=[DataRequired()])
 
@@ -29,22 +29,22 @@ class DocumentEditForm(DocumentForm):
 	file = FileField("File", description='If you leave this field blank, it will use the previously saved file.')
 
 class Document(db.Model):
-	id = db.Column(db.Integer, primary_key=True)
-	title = db.Column(db.String(), nullable=False)
-	description = db.Column(db.String(), nullable=False)
+	id 				= db.Column(db.Integer, primary_key=True)
+	title 			= db.Column(db.String(), nullable=False)
+	description 	= db.Column(db.String(), nullable=False)
 	document_access = db.Column(db.String(), nullable=False)
-	file_type = db.Column(db.String(), nullable=False)
-	event_id = db.Column(db.Integer, db.ForeignKey('event.id'))
+	file_type 		= db.Column(db.String(), nullable=False)
+	hidden_fields 	= ['id', 'description']
 	
 	def __init__(self, title, description, file_type, document_access='public'):
-		self.title = title
-		self.description = description
-		self.document_access = document_access
-		self.file_type = file_type
+		self.title 				= title
+		self.description 		= description
+		self.document_access	= document_access
+		self.file_type 			= file_type
 
 	@staticmethod
 	def __dir__():
-		return ['id', 'title', 'description', 'document_access', 'file_type', 'event_id']
+		return ['id', 'title', 'description', 'document_access', 'file_type']
 
 	@staticmethod
 	def exists_id(id):
@@ -73,22 +73,23 @@ blueprint = Blueprint('document', __name__, url_prefix='/document')
 @authentication.can_write(Document.__name__)
 def document_new():
 	documentForm = DocumentForm()
-	if documentForm.validate_on_submit():
-		user = authentication.getCurrentUser()
-		fileData = documentForm.file.data
-		title = documentForm.title.data
-		description = documentForm.description.data
-		document_access = documentForm.document_access.data
-		file_type = fileData.filename[fileData.filename.rfind('.') + 1:]
+	if request.method == 'POST':
+		if documentForm.validate_on_submit():
+			user 			= authentication.getCurrentUser()
+			fileData 		= documentForm.file.data
+			title 			= documentForm.title.data
+			description 	= documentForm.description.data
+			document_access = documentForm.document_access.data
+			file_type 		= os.path.splitext(fileData.filename)[1][1:]
 
-		newDocument = Document(title=title, description=description, document_access=document_access, file_type=file_type)
-		db.session.add(newDocument)
-		user.actions.append(UserAction(model_type=Document.__name__, model_title=title+'.'+file_type, action='Created', when=datetime.datetime.now()))
-		db.session.commit()
-		uploadFile(fileData, newDocument.id)
+			newDocument = Document(title=title, description=description, document_access=document_access, file_type=file_type)
+			db.session.add(newDocument)
+			user.actions.append(UserAction(model_type=Document.__name__, model_title=title+'.'+file_type, action='Created', when=datetime.datetime.now()))
+			db.session.commit()
+			uploadFile(fileData, newDocument.id)
 
-		flash('Document Created', 'success')
-		return redirect(url_for('document.document_edit', document_id=newDocument.id))
+			flash('Document Created', 'success')
+			return redirect(newDocument.getEditRoute())
 
 	return authentication.auth_render_template('admin/model.html', form=documentForm, type='new', model=Document, breadcrumbTitle='New Document')
 
@@ -97,33 +98,32 @@ def document_new():
 def document_edit(document_id):
 	editingDocument = Document.exists_id(document_id)
 	if editingDocument == None:
-		return redirect(url_for('document.documents_get'))
+		return redirect(Document.getAllRoute())
 	
 	documentForm = DocumentEditForm()
-	if authentication.getCurrentUser().canWrite(Document.__name__) and documentForm.validate_on_submit():
-		user = authentication.getCurrentUser()
-		fileData = documentForm.file.data
-		title = documentForm.title.data
-		description = documentForm.description.data
-		document_access = documentForm.document_access.data
-		
-		if fileData:
-			file_type = fileData.filename[fileData.filename.rfind('.') + 1:]
-			editingDocument.file_type = file_type
-			uploadFile(fileData, document_id)
+	if request.method == 'POST':
+		if authentication.getCurrentUser().canWrite(Document.__name__) and documentForm.validate_on_submit():
+			user 			= authentication.getCurrentUser()
+			fileData 		= documentForm.file.data
+			title 			= documentForm.title.data
+			description 	= documentForm.description.data
+			document_access = documentForm.document_access.data
+			
+			if fileData:
+				editingDocument.file_type = os.path.splitext(fileData.filename)[1][1:]
+				uploadFile(fileData, document_id)
 
-		editingDocument.title = title
-		editingDocument.description = description
-		editingDocument.document_access = document_access
+			editingDocument.title 			= title
+			editingDocument.description 	= description
+			editingDocument.document_access = document_access
 
-		user.actions.append(UserAction(model_type=Document.__name__, model_title=title+'.'+editingDocument.file_type, action='Edited', when=datetime.datetime.now()))
-		db.session.commit()
-		flash('Document Edited', 'success')
-		return redirect(url_for('document.document_edit', document_id=editingDocument.id))
+			user.actions.append(UserAction(model_type=Document.__name__, model_title=title+'.'+editingDocument.file_type, action='Edited', when=datetime.datetime.now()))
+			db.session.commit()
+			flash('Document Edited', 'success')
 
-	documentForm.title.data = editingDocument.title
-	documentForm.description.data = editingDocument.description
-	documentForm.document_access.data = editingDocument.document_access
+	documentForm.title.data 			= editingDocument.title
+	documentForm.description.data 		= editingDocument.description
+	documentForm.document_access.data 	= editingDocument.document_access
 	return authentication.auth_render_template('admin/model.html', form=documentForm, type='edit', model=Document, breadcrumbTitle=documentForm.title.data, data=editingDocument)
 
 @blueprint.route('/<int:document_id>/delete', methods=['POST'])
@@ -131,15 +131,16 @@ def document_edit(document_id):
 def document_delete(document_id):
 	editingDocument = Document.exists_id(document_id)
 	if editingDocument == None:
-		return redirect(url_for('document.documents_get'))
-
-	user = authentication.getCurrentUser()
-	deleteFile(document_id)
-	user.actions.append(UserAction(model_type=Document.__name__, model_title=editingDocument.title+'.'+editingDocument.file_type, action='Deleted', when=datetime.datetime.now()))
-	db.session.delete(editingDocument)
-	db.session.commit()
-	flash('Document Deleted', 'success')
-	return redirect(url_for('document.documents_get'))
+		flash('Document does not exist', 'danger')
+	else:
+		user = authentication.getCurrentUser()
+		deleteFile(document_id)
+		user.actions.append(UserAction(model_type=Document.__name__, model_title=editingDocument.title+'.'+editingDocument.file_type, action='Deleted', when=datetime.datetime.now()))
+		db.session.delete(editingDocument)
+		db.session.commit()
+		flash('Document Deleted', 'success')
+		
+	return redirect(Document.getAllRoute())
 
 @blueprint.route('/<int:document_id>/')
 def document_get(document_id):
@@ -162,16 +163,12 @@ def document_get(document_id):
 @authentication.can_read(Document.__name__)
 def documents_get():
 	documents = Document.query.all()
-	hidden_fields = ['id', 'description', 'event_id']
-	return authentication.auth_render_template('admin/getAllBase.html', data=documents, model=Document, hidden_fields=hidden_fields)
+	return authentication.auth_render_template('admin/getAllBase.html', data=documents, model=Document, hidden_fields=Document.hidden_fields)
 
 def getDocumentsByUserType(type):
-	docs = []
 	if type == authentication.ADMIN and authentication.getCurrentUser().canRead(Document.__name__):
-		docs = Document.query.order_by(Document.title).all()
-	else:
-		docs = Document.query.order_by(Document.title).filter_by(document_access=authentication.PUBLIC).all()
-	return docs
+		return Document.query.order_by(Document.title).all()
+	return Document.query.order_by(Document.title).filter_by(document_access=authentication.PUBLIC).all()
 
 def uploadFile(fileData, id):
 	from flask import current_app as app

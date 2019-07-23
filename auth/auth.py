@@ -13,11 +13,11 @@ def can_read(model):
 		@wraps(f)
 		def decorator(*args, **kwargs):
 			user = getCurrentUser()
-			if user == None or not user.canRead(model):
-				flash('You do not have access', 'danger')
-				return redirect(url_for('admin.login'))
-			else:
+			if user != None and user.canRead(model):
 				return f(*args, **kwargs)
+
+			flash('You do not have access', 'danger')
+			return redirect(url_for('admin.login'))
 		return decorator
 	return outer_decorator
 
@@ -26,11 +26,11 @@ def can_write(model):
 		@wraps(f)
 		def decorator(*args, **kwargs):
 			user = getCurrentUser()
-			if user == None or not user.canWrite(model):
-				flash('You do not have access', 'danger')
-				return redirect(url_for('admin.login'))
-			else:
+			if user != None and user.canWrite(model):
 				return f(*args, **kwargs)
+
+			flash('You do not have access', 'danger')
+			return redirect(url_for('admin.login'))
 		return decorator
 	return outer_decorator
 
@@ -56,11 +56,11 @@ def login_required():
 	def outer_decorator(f):
 		@wraps(f)
 		def decorator(*args, **kwargs):
-			if not isLoggedIn():
-				flash('Access Denied', 'danger')
-				return redirect(url_for('admin.login'))
-			else:
+			if isLoggedIn():
 				return f(*args, **kwargs)
+				
+			flash('Access Denied', 'danger')
+			return redirect(url_for('admin.login'))
 		return decorator
 	return outer_decorator
 
@@ -68,12 +68,8 @@ import database.models.user as user_models
 
 def login(username, password):
 	users = user_models.User.query.filter_by(username=username).all()
-	user = None
 	for u in users:
 		if u.check_password(password):
-			user = u
-			break
-	if user is None:
-		return False
-	session[SESSION_USER] = user.id
-	return True
+			session[SESSION_USER] = u.id
+			return True
+	return False

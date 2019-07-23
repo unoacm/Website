@@ -7,23 +7,22 @@ DATABASE_MODELS = [
 	'User',
 	'UserAction',
 	'Member',
-	'Event',
 	'Document'
-	]
+]
 
 EDITABLE_DATABASE_MODELS = [
 	'User',
 	'Document',
-	'Event',
 	'Member',
 	'Suggestion'
-	]
+]
 
-def getTitleNames(model):
-	return [attr.replace('_', ' ').strip().title() for attr in model.__dir__()]
 
 def getAttributeNames(model):
-	return [attr for attr in model.__dir__()]
+	return model.__dir__()
+
+def getTitleNames(model):
+	return [attr.replace('_', ' ').strip().title() for attr in getAttributeNames(model)]
 
 def getTitlesWithAttributes(model):
-	return [(attr.replace('_', ' ').strip().title(), attr) for attr in model.__dir__()]
+	return [(attr.replace('_', ' ').strip().title(), attr) for attr in getAttributeNames(model)]

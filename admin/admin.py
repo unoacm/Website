@@ -19,7 +19,6 @@ import database.models.user as user_models
 import database.models.suggestion as suggestion_models
 import database.models.member as member_models
 import database.models.document as document_models
-import database.models.event as event_models
 import datetime, collections
 
 class UserLoginForm(FlaskForm):
@@ -29,24 +28,35 @@ class UserLoginForm(FlaskForm):
 
 blueprint = Blueprint('admin', __name__, url_prefix='/admin')
 
+model_data = collections.OrderedDict()
+
+model_data["AUTHENTICATION AND AUTHORIZATION"] = \
+[
+	["Users", user_models.User]
+]
+
+model_data["INTERAL"] = \
+[
+	["Members", member_models.Member]
+]
+
+model_data["EXTERNAL"] = \
+[
+	["Suggestions", suggestion_models.Suggestion],
+	["Documents", document_models.Document]
+]
+
 @blueprint.route('/')
 @authentication.login_required()
 def index():
-	data = collections.OrderedDict()
-	data["AUTHENICATION AND AUTHORIZATION"] = [["Users", user_models.User]]
-	data["OTHER"] = [["Members", member_models.Member],
-					 ["Suggestions", suggestion_models.Suggestion],
-					 ["Documents", document_models.Document],
-					 ["Events", event_models.Event]
-					]
-	
 	user = authentication.getCurrentUser()
 	if user == None:
 		flash('Access Denied', 'danger')
 		return redirect(url_for('admin.login'))
+		
 	weekAgo = datetime.datetime.now() - datetime.timedelta(days=7)
 	recentActions = user.actions.filter(UserAction.when > weekAgo)
-	return authentication.auth_render_template('admin/index.html', data=data, recentActions=recentActions)
+	return authentication.auth_render_template('admin/index.html', data=model_data, recentActions=recentActions)
 
 @blueprint.route('/login', methods=['GET', 'POST'])
 def login():
