@@ -46,10 +46,12 @@ source start.sh
 
 ## Needed Environmental Variables
 
-FLASK_ENV : 'development', 'production' : This tells flask whether the app is in development or production. In production a different database name/type will be used.
+FLASK_ENV 				 : 'development', 'production' : This tells flask whether the app is in development or production. In production a different database name/type will be used.
 
-FLASK_ADMIN_USERNAME : anything : This will be used in creation of the default admin to sign in to the admin page
+ACM_FLASK_ADMIN_USERNAME : anything : This will be used in creation of the default admin to sign in to the admin page.
 
-FLASK_ADMIN_PASSWORD : anything : This will be used in creation of the default admin to sign in to the admin page
+ACM_FLASK_ADMIN_PASSWORD : anything : This will be used in creation of the default admin to sign in to the admin page.
+
+ACM_FLASK_SECRET_KEY	 : anything : This is a key that Flask uses for security. Must be set when in production mode.
 
 More installation instructions might appear as this application gets ready for production.
