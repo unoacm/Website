@@ -4,11 +4,11 @@
 {% block title %}{{model.__name__.capitalize()}}s{% endblock %}
 {% block breadcrumb %}
 	<li class="breadcrumb-item"><a href="{{url_for('admin.index')}}">Home</a></li>
-	<li class="breadcrumb-item active">{{model.__name__.capitalize()}}s</li>
+	<li class="breadcrumb-item active">{{model.__name__.capitalize().replace('_', ' ')}}s</li>
 {% endblock %}
 {% block content %}
 	<div class="ml-2">
-		<h4 class="d-inline-block text-muted">Select {{model.__name__.lower()}} to change</h4>
+		<h4 class="d-inline-block text-muted">Select {{model.__name__.lower().replace('_', ' ').title()}} to change</h4>
 		{% with messages = get_flashed_messages(with_categories=True) %}
 			{% if messages %}
 			<div id="flashes" class="d-inline-block">
@@ -20,7 +20,7 @@
 		{% endwith %}
 		{% if user.canWrite(model.__name__) %}
 			<a href="{{model.getNewRoute()}}" class="badge badge-secondary float-right p-2 mr-1 text-white">
-				ADD {{model.__name__.upper()}}
+				ADD {{model.__name__.upper().replace('_', ' ')}}
 				<img class="icon align-bottom ml-1" src="{{url_for('static', filename='icons/si-glyph-plus.svg')}}" >
 			</a>
 		{% endif %}
@@ -85,7 +85,7 @@
 			</tbody>
 		</table>
 		<div class="ml-4 text-muted">
-			<span id="amount">{{data|length}}</span> {{model.__name__.lower()}}{% if data|length != 1 %}s{% endif %}
+			<span id="amount">{{data|length}}</span> {{model.__name__.lower().replace('_', ' ').title()}}{% if data|length != 1 %}s{% endif %}
 		</div>
 		<div id="model-count-line" class="ml-3">
 			<hr>

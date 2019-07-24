@@ -36,7 +36,7 @@ class Document(db.Model):
 	file_type 		= db.Column(db.String(), nullable=False)
 	hidden_fields 	= ['id', 'description']
 	
-	def __init__(self, title, description, file_type, document_access='public'):
+	def __init__(self, title, description, file_type, document_access):
 		self.title 				= title
 		self.description 		= description
 		self.document_access	= document_access
@@ -98,6 +98,7 @@ def document_new():
 def document_edit(document_id):
 	editingDocument = Document.exists_id(document_id)
 	if editingDocument == None:
+		flash('Document does not exist', 'danger')
 		return redirect(Document.getAllRoute())
 	
 	documentForm = DocumentEditForm()
