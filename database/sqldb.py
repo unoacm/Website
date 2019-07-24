@@ -8,7 +8,7 @@ DATABASE_MODELS = [
 	'UserAction',
 	'Member',
 	'Document',
-	'BlogPost'
+	'Blog_Post'
 ]
 
 EDITABLE_DATABASE_MODELS = [
