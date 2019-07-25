@@ -39,6 +39,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] 			= databaseURL
 app.config['SECRET_KEY'] 						= ACM_FLASK_SECRET_KEY
 app.config['DOCUMENT_PATH'] 					= os.path.join(app.instance_path, 'documents')
 app.config['EVENT_PATH'] 						= os.path.join(app.instance_path, 'events')
+app.config['ADMIN_GENERATED']					= os.path.join(app.instance_path, 'generated')
 
 db.init_app(app)
 db.create_all()

@@ -28,19 +28,19 @@ class Blog_Post(db.Model):
 	content			= db.Column(db.String(), nullable=False)
 	author			= db.Column(db.String(), nullable=False)
 	access			= db.Column(db.String(), nullable=False)
-	date_time		= db.Column(db.DateTime(), nullable=False)
+	created			= db.Column(db.DateTime(), nullable=False)
 	hidden_fields	= ['id', 'content']
 
-	def __init__(self, title, author, access, content, date_time):
+	def __init__(self, title, author, access, content, created):
 		self.title 		= title
 		self.author		= author
 		self.access		= access
 		self.content	= content
-		self.date_time	= date_time
+		self.created	= created
 
 	@staticmethod
 	def __dir__():
-		return ['id', 'title', 'content', 'author', 'access', 'date_time']
+		return ['id', 'title', 'content', 'author', 'access', 'created']
 	
 	@staticmethod
 	def exists_id(id):
@@ -75,11 +75,11 @@ def blog_post_new():
 			title		= blogForm.title.data
 			contents	= blogForm.delta.data
 			access		= blogForm.access.data
-			date_time	= datetime.datetime.now()
+			created	= datetime.datetime.now()
 
-			newBlogPost	= Blog_Post(title=title, content=contents, author=user.username, access=access, date_time=date_time)
+			newBlogPost	= Blog_Post(title=title, content=contents, author=user.username, access=access, created=created)
 			db.session.add(newBlogPost)
-			user.actions.append(UserAction(model_type=Blog_Post.__name__, model_title=title, action='Created', when=date_time))
+			user.actions.append(UserAction(model_type=Blog_Post.__name__, model_title=title, action='Created', when=created))
 			db.session.commit()
 			flash('Blog Post Created', 'success')
 			return redirect(newBlogPost.getEditRoute())

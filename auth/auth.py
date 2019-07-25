@@ -50,7 +50,7 @@ def getCurrentUserType():
 
 def auth_render_template(*args, **kwargs):
 	user = getCurrentUser()
-	return render_template(*args, **kwargs, user=user, isLoggedIn=isLoggedIn)
+	return render_template(*args, **kwargs, user=user, isLoggedIn=isLoggedIn())
 
 def login_required():
 	def outer_decorator(f):
