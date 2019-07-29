@@ -1,0 +1,88 @@
+{% extends 'main/base.html' %}
+{% block title %}Blog{% endblock %}
+{% block blog_active %}active{% endblock %}
+{% block content %}
+	{% set text_length = 350 %}
+	<h1 class="heading d-inline-block">Blog Posts</h1>
+	<form class="ml-3 py-2 d-inline-block align-middle form-inline w-75">
+		<h4 class="d-inline-block">Search:</h4>
+			<div class="ml-3 d-inline-block">
+				<h5 class="input-group input-group-sm d-inline-block">
+					Title: <input id="title" name="title" type="text" class="form-control d-inline-block w-75 rounded-pill" {% if title_filter != None %}value="{{title_filter}}"{% endif %}>
+				</h5>
+			</div>
+			<div class="ml-3 d-inline-block">
+				<h5 class="input-group input-group-sm d-inline-block">
+					Year: <input id="year" name="year" type="number" min="2000" step="1" class="form-control d-inline-block rounded-pill w-75" {% if year_filter != None %}value="{{year_filter}}"{% endif %}>
+				</h5>
+			</div>
+			<div class="ml-3 d-inline-block">
+				<h5 class="input-group input-group-sm d-inline-block">
+					Semester: 
+					<select id="semester" name="semester" class="form-control d-inline-block w-50">
+						<option defaultSelected {% if semester_filter == None %}selected{% endif %}></option>
+						<option {% if semester_filter == 'Spring' %}selected{% endif %}>Spring</option>
+						<option {% if semester_filter == 'Summer' %}selected{% endif %}>Summer</option>
+						<option {% if semester_filter == 'Fall' %}selected{% endif %}>Fall</option>
+					</select>
+				</h5>
+			</div>
+			<button type="submit" class="ml-3 btn btn-outline-secondary btn-sm">Search</button>
+			<button type="button" onclick="resetFilters()" class="ml-3 btn btn-outline-secondary btn-sm">Clear</button>
+
+			<script>
+				function resetFilters() {
+					document.getElementById('title').value = '';
+					document.getElementById('year').value = '';
+					document.getElementById('semester').selectedIndex = 0;
+				}
+			</script>
+	</form>
+	<hr>
+	{% if blogs|length == 0 %}
+		<div class="jumbotron jumbotron-fluid">
+			<div class="container">
+				<h1 class="display-4">No Blog Posts</h1>
+				<p class="lead">Sorry, no blog posts are available at this time. Check back again.</p>
+			</div>
+		</div>
+	{% endif %}
+	<div class="container mt-5">
+		{% for blog, text in zip(blogs, texts) %}
+			{% for section, b in sections %}
+				{% if b == blog %}
+					<h1 class="bg-light mb-4 p-3">{{section}}</h1>
+				{% endif %}
+			{% endfor %}
+			<div class="card mb-5">
+				<div class="card-body">
+					<h5 class="card-title">{{blog.title}}</h5>
+					<h6 class="card-subtitle mb-2 text-muted">{{blog.created.strftime('%Y-%m-%d %I:%M %p')}}</h6>
+					<p class="card-text {% if text|length >= text_length %}fade-text{% endif %}">
+						{{text[0:text_length]}}
+					</p>
+					<a href="{{blog.getGetRoute()}}" class="card-link">Read More</a>
+				</div>
+			</div>
+		{% endfor %}
+		<nav aria-label="Page navigation example">
+			<ul class="pagination justify-content-center">
+				<li class="page-item {% if page == 1 %}disabled{% endif %}">
+				<a class="page-link" href="{{url_for('main.blog_page', page=page-1, title=title_filter, year=year_filter, semester=semester_filter)}}" aria-label="Previous">
+					<span aria-hidden="true">&laquo;</span>
+				</a>
+				</li>
+				{% for p in range(1, maxPages+1) %}
+					<li class="page-item {% if page == p %}disabled{% endif %}">
+						<a class="page-link" href="{{url_for('main.blog_page', page=p, title=title_filter, year=year_filter, semester=semester_filter)}}">{{p}}</a>
+					</li>
+				{% endfor %}
+				<li class="page-item {% if page == maxPages %}disabled{% endif %}">
+				<a class="page-link" href="{{url_for('main.blog_page', page=page+1, title=title_filter, year=year_filter, semester=semester_filter)}}" aria-label="Next">
+					<span aria-hidden="true">&raquo;</span>
+				</a>
+				</li>
+			</ul>
+		</nav>
+	</div>
+{% endblock %}

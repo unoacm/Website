@@ -130,13 +130,26 @@ def blog_post_delete(blog_post_id):
 
 	return redirect(Blog_Post.getAllRoute())
 
-@blueprint.route('/<int:blog_post_id>/')
-def blog_post_get(blog_post_id):
-	pass
-
 @blueprint.route('blog_posts')
 @authentication.can_read(Blog_Post.__name__)
 def blog_posts_get():
-	posts = Blog_Post.query.all()
+	posts = Blog_Post.query.order_by(Blog_Post.created.desc()).all()
 	return authentication.auth_render_template('admin/getAllBase.html', data=posts, model=Blog_Post, hidden_fields=Blog_Post.hidden_fields)
 
+@blueprint.route('/<int:blog_post_id>/')
+def blog_post_get(blog_post_id):
+	user = authentication.getCurrentUser()
+	getting_blog = Blog_Post.query.filter_by(id=blog_post_id).first()
+	if getting_blog == None:
+		flash('Blog post does not exist', 'warning')
+		return redirect(url_for('main.blog'))
+	if getting_blog.access == authentication.ADMIN:
+		if user == None or not user.canRead(Blog_Post.__name__):
+			flash('You do not have permission', 'danger')
+			return redirect(url_for('main.blog'))
+	return render_template('main/blog_post.html', post=getting_blog)
+
+def getBlogsByUserType(type):
+	if type == authentication.ADMIN and authentication.getCurrentUser().canRead(Blog_Post.__name__):
+		return Blog_Post.query.order_by(Blog_Post.created.desc()).all()
+	return Blog_Post.query.order_by(Blog_Post.created.desc()).filter_by(access=authentication.PUBLIC).all()

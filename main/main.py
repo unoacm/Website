@@ -10,11 +10,16 @@ import database.models.document as document_models
 import database.models.blog as blog_models
 import auth.auth as authentication
 import math, datetime, os
+import json
 
 blueprint = Blueprint('main', __name__, url_prefix='/')
 
 DOCUMENTS_PER_ROW		= 3
 MAX_DOCUMENT_PER_PAGE 	= 9
+
+MAX_BLOGS_PER_PAGE		= 5
+BLOG_SPRING_SEMESTER	= datetime.date(year=1901, month=5, day=20)
+BLOG_SUMMER_SEMESTER	= datetime.date(year=1901, month=8, day=20)
 
 class AboutForm(FlaskForm):
 	delta = HiddenField('delta')
@@ -34,7 +39,6 @@ def about():
 	contents = '[]'
 
 	if request.method == 'POST' and user != None and user.canWrite(blog_models.Blog_Post.__name__) and form.validate_on_submit():
-		print("Hello!")
 		contents = form.delta.data
 		with open(about_page, 'w') as f:
 			f.write(contents)
@@ -52,9 +56,84 @@ def about():
 def events():
 	return render_template('main/events.html')
 
+@blueprint.route('blog')
+def blog():
+	return blog_page(1)
+
+@blueprint.route('blog/<int:page>')
+def blog_page(page):
+	if page <= 0:
+		page = 1
+
+	title_filter	= request.args.get('title', default=None, type=str)
+	year_filter		= request.args.get('year', default=None, type=int)
+	semester_filter	= request.args.get('semester', default=None, type=str)
+
+	if title_filter == '':
+		title_filter = None
+	if year_filter == '':
+		year_filter = None
+	if semester_filter == '':
+		semester_filter = None
+
+	blog_posts = [post for post in blog_models.getBlogsByUserType(authentication.getCurrentUserType()) if filter_post(post, title_filter, year_filter, semester_filter)]
+	blog_texts = [json.loads(x.content) for x in blog_posts]
+	for i,text in enumerate(blog_texts):
+		actual_text = ''
+		for section in text['ops']:
+			if type(section['insert']) == str:
+				actual_text += section['insert']
+		blog_texts[i] = actual_text
+
+	if len(blog_posts) == 0 or max(1, math.ceil(len(blog_posts) / MAX_BLOGS_PER_PAGE)) < page:
+		page = 1
+
+	sections = []
+	current_section = None
+	for post in blog_posts:
+		section = f'{get_post_semester(post)} {str(post.created.year)}'
+		if section != current_section:
+			sections.append((section, post))
+			current_section = section
+
+	return authentication.auth_render_template(
+		'main/blog.html', 
+		blogs=blog_posts[(page - 1) * MAX_BLOGS_PER_PAGE:MAX_BLOGS_PER_PAGE * page],
+		texts=blog_texts[(page - 1) * MAX_BLOGS_PER_PAGE:MAX_BLOGS_PER_PAGE * page],
+		sections=sections,
+		title_filter=title_filter,
+		year_filter=year_filter,
+		semester_filter=semester_filter,
+		page=page,
+		maxPages=max(math.ceil(len(blog_posts) / MAX_BLOGS_PER_PAGE), 1),
+		zip=zip
+	)
+
+def filter_post(post, title_filter, year_filter, semester_filter):
+	if title_filter != None:
+		if title_filter.lower() not in post.title.lower():
+			return False
+	if year_filter != None:
+		if post.created.year != year_filter:
+			return False
+	if semester_filter != None:
+		if get_post_semester(post) != semester_filter:
+			return False
+	
+	return True
+
+def get_post_semester(post):
+	if post.created.month < BLOG_SPRING_SEMESTER.month or post.created.month == BLOG_SPRING_SEMESTER.month and post.created.day <= BLOG_SPRING_SEMESTER.day:
+		section = 'Spring'
+	elif post.created.month < BLOG_SUMMER_SEMESTER.month or post.created.month == BLOG_SUMMER_SEMESTER.month and post.created.day <= BLOG_SUMMER_SEMESTER.day:
+		section = 'Summer'
+	else:
+		section = 'Fall'
+	return section
+
 @blueprint.route('documents')
 def documents():
-	return redirect(url_for('main.documents_page', page=1))
+	return documents_page(1)
 
 @blueprint.route('documents/<int:page>')
 def documents_page(page):
@@ -62,7 +141,7 @@ def documents_page(page):
 		page = 1
 	docs = document_models.getDocumentsByUserType(authentication.getCurrentUserType())
 	
-	if len(docs) == 0 and page != 1 or max(1, math.ceil(len(docs) / MAX_DOCUMENT_PER_PAGE)) < page:
+	if len(docs) == 0 or max(1, math.ceil(len(docs) / MAX_DOCUMENT_PER_PAGE)) < page:
 		page = 1
 		
 	return authentication.auth_render_template(

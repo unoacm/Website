@@ -1,0 +1,30 @@
+{% extends 'main/base.html' %}
+{% block title %}{{post.title}}{% endblock %}
+{% block blog_active %}active{% endblock %}
+{% block content %}
+	<link rel="stylesheet" href="{{url_for('static', filename='css/katex.css')}}">
+	<script src="{{url_for('static', filename='js/katex.js')}}"></script>
+
+	<link href="{{url_for('static', filename='css/darcula.css')}}" rel="stylesheet">
+	<script src="{{url_for('static', filename='js/highlight.min.js')}}"></script>
+
+	<script src="{{url_for('static', filename='js/quill.min.js')}}"></script>
+	<link rel="stylesheet" href="{{url_for('static', filename='css/quill.snow.css')}}">
+
+	<div class="ml-5 mr-5">
+		<h1>{{post.title}}</h1>
+		<small class="text-muted">Posted on {{post.created.strftime('%Y-%m-%d %I:%M %p')}}</small>
+		<hr>
+		<div id="post" class="bg-light p-3" value="{{post.content}}"></div>
+	</div>
+
+	<script>
+		var quill = new Quill('#post', {
+			modules: {
+				syntax: true
+			},
+			readOnly: true,
+		});
+		quill.setContents(JSON.parse(document.getElementById('post').getAttribute('value')));
+	</script>
+{% endblock %}

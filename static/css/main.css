@@ -42,14 +42,15 @@ html, body
 	height: 40%;
 }
 
-.footer {
+.footer
+{
 	position: absolute;
 	right: 0;
 	bottom: -1;
 	left: 0;
 	padding: 1rem;
 	height: 100px;
-  }
+}
 
 .form-body
 {
@@ -109,4 +110,11 @@ table
 {
 	width: auto;
 	height: 300px;
+}
+
+.fade-text
+{
+	max-height: 115px;
+	overflow: hidden;
+	mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0) 100%);
 }

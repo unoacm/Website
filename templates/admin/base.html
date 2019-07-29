@@ -1,11 +1,11 @@
 {% extends "main/base.html" %}
 {% block header %}
-	<nav id="admin-nav" class="navbar bg-info">
+	<nav id="admin-nav" class="navbar">
 		<a id="admin-brand" class="navbar-brand" href="{{url_for('admin.index')}}">Administration</a>
 		<div class="float-right">
 			<span id="userType">Welcome, {{user.username}}.</span>
-			<a class="text-white" href="{{url_for('main.index')}}">VIEW SITE</a> / 
-			<a class="text-white" href="{{url_for('admin.logout')}}">LOG OUT</a>
+			<a class="text-primary" href="{{url_for('main.index')}}">VIEW SITE</a> / 
+			<a class="text-primary" href="{{url_for('admin.logout')}}">LOG OUT</a>
 		</div>
 	</nav>
 	<nav style="margin-top: 0;">

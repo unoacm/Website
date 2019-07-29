@@ -149,7 +149,7 @@ def document_get(document_id):
 	user = authentication.getCurrentUser()
 	gettingDocument = Document.query.filter_by(id=document_id).first()
 	if gettingDocument == None:
-		flash('Document does not exist')
+		flash('Document does not exist', 'warning')
 		return redirect(url_for('main.documents'))
 	if gettingDocument.document_access == authentication.ADMIN:
 		if user == None or not user.canRead(Document.__name__):

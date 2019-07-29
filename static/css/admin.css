@@ -1,11 +1,16 @@
+#admin-nav
+{
+	background-color: rgba(1, 130, 172, .3); /* ACM blue */
+}
+
 #userType
 {
-	color: #f4ff82;
+	color: #000000;
 }
 
 #admin-brand
 {
-	color: #ffe563;
+	color: #000000;
 	font-size: 2em;
 }
 

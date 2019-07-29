@@ -6,7 +6,6 @@ from flask_sqlalchemy import SQLAlchemy
 from database.sqldb import db as db
 import os, sys
 import main.main as main
-import blog.blog as blog
 import admin.admin as admin
 import database.models.user as user_models
 import database.models.member as member_models
@@ -45,7 +44,6 @@ db.init_app(app)
 db.create_all()
 
 app.register_blueprint(main.blueprint)
-app.register_blueprint(blog.blueprint)
 app.register_blueprint(admin.blueprint)
 
 app.register_blueprint(user_models.blueprint)

@@ -22,7 +22,7 @@
 			<div class="navbar-nav">
 				<a class="nav-item nav-link {% block about_active %}{% endblock %}" href="{{url_for('main.about')}}">About us</a>
 				<a class="nav-item nav-link {% block events_active %}{% endblock %}" href="{{url_for('main.events')}}">Events</a>
-				<a class="nav-item nav-link {% block blog_active %}{% endblock %}" href="{{url_for('blog.index')}}">Blog</a>
+				<a class="nav-item nav-link {% block blog_active %}{% endblock %}" href="{{url_for('main.blog')}}">Blog</a>
 				<a class="nav-item nav-link {% block documents_active %}{% endblock %}" href="{{url_for('main.documents')}}">Documents</a>
 				<a class="nav-item nav-link {% block suggestions_active %}{% endblock %}" href="{{url_for('suggestion.suggestion_new')}}">Give a Suggestion</a>
 				{% if session.get('user') != None %}
@@ -50,7 +50,7 @@
 				</div>
 				<div class="col-md-7">
 					<div id="copyright">
-						© 2018 Copyright: UNO ACM College Chapter
+						© 2019 Copyright: UNO ACM College Chapter
 					</div>
 				</div>
 			</div>

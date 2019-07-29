@@ -73,10 +73,16 @@ def suggestion_new():
 	if request.method == 'POST':
 		if suggestionForm.validate_on_submit():
 			user 		= authentication.getCurrentUser()
-			first_name 	= suggestionForm.first_name.data
-			last_name 	= suggestionForm.last_name.data
-			title 		= suggestionForm.title.data
+			first_name 	= suggestionForm.first_name.data.strip()
+			last_name 	= suggestionForm.last_name.data.strip()
+			title 		= suggestionForm.title.data.strip()
 			description = suggestionForm.description.data
+
+			if first_name == '':
+				first_name = '-'
+			if last_name == '':
+				last_name = '-'
+
 			suggestion 	= Suggestion(first_name=first_name, last_name=last_name, title=title, description=description)
 
 			if user != None:
@@ -100,10 +106,15 @@ def suggestion_edit(suggestion_id):
 		if authentication.getCurrentUser().canWrite(Suggestion.__name__) and suggestionForm.validate_on_submit():
 			user = authentication.getCurrentUser()
 
-			editingSuggestion.first_name 	= suggestionForm.first_name.data
-			editingSuggestion.last_name 	= suggestionForm.last_name.data
-			editingSuggestion.title 		= suggestionForm.title.data
+			editingSuggestion.first_name 	= suggestionForm.first_name.data.strip()
+			editingSuggestion.last_name 	= suggestionForm.last_name.data.strip()
+			editingSuggestion.title 		= suggestionForm.title.data.strip()
 			editingSuggestion.description 	= suggestionForm.description.data
+
+			if editingSuggestion.first_name == '':
+				editingSuggestion.first_name = '-'
+			if editingSuggestion.last_name == '':
+				editingSuggestion.last_name = '-' 
 
 			user.actions.append(UserAction(model_type=Suggestion.__name__, model_title=editingSuggestion.title, action='Edited', when=datetime.datetime.now()))
 			db.session.commit()
