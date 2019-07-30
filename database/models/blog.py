@@ -75,7 +75,7 @@ def blog_post_new():
 			title		= blogForm.title.data
 			contents	= blogForm.delta.data
 			access		= blogForm.access.data
-			created	= datetime.datetime.now()
+			created		= datetime.datetime.now()
 
 			newBlogPost	= Blog_Post(title=title, content=contents, author=user.username, access=access, created=created)
 			db.session.add(newBlogPost)
@@ -139,7 +139,7 @@ def blog_posts_get():
 @blueprint.route('/<int:blog_post_id>/')
 def blog_post_get(blog_post_id):
 	user = authentication.getCurrentUser()
-	getting_blog = Blog_Post.query.filter_by(id=blog_post_id).first()
+	getting_blog = Blog_Post.exists_id(blog_post_id)
 	if getting_blog == None:
 		flash('Blog post does not exist', 'warning')
 		return redirect(url_for('main.blog'))

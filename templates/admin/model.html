@@ -101,7 +101,7 @@
 				{% endfor %}
 			{% endif %}
 
-			{% if model.__name__.lower() == 'blog_post' %}
+			{% if 'delta' in form.__dir__() %}
 				<div id="editor"></div>
 			{% endif %}
 		</form>
@@ -134,7 +134,7 @@
 		{% endfor %}
 	{% endif %}
 
-	{% if model.__name__.lower() == 'blog_post' %}
+	{% if 'delta' in form.__dir__() %}
 		<link rel="stylesheet" href="{{url_for('static', filename='css/katex.min.css')}}">
 		<script src="{{url_for('static', filename='js/katex.min.js')}}"></script>
 
@@ -148,21 +148,35 @@
 
 		<script src="{{url_for('static', filename='js/image-resize.min.js')}}"></script>
 
+		{% if type=='edit' %}
+			<script>
+				var quill = new Quill('#editor', {
+					modules: {
+						syntax: true,
+						toolbar: quillToolbar,
+						imageResize: {
+							displaySize: true
+						}
+					},
+					theme: 'snow',
+				});
+			</script>
+		{% else %}
+			<script>
+				var quill = new Quill('#editor', {
+					modules: {
+						syntax: true,
+						toolbar: quillToolbar,
+					},
+					theme: 'snow',
+				});
+			</script>
+		{% endif %}
+
 		<script>
-
-			var quill = new Quill('#editor', {
-				modules: {
-					syntax: true,
-					toolbar: quillToolbar,
-					imageResize: {
-						displaySize: true
-					}
-				},
-				theme: 'snow',
-			});
-
 			var hidden_text_field = document.getElementById('delta');
 			var quillTextArea = document.getElementsByClassName("ql-editor");
+			quillTextArea[0].contentEditable = 'false';
 
 			var submit_entry = function(event) {
 				hidden_text_field.value = JSON.stringify(quill.getContents());

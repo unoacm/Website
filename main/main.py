@@ -8,6 +8,7 @@ from flask_wtf import FlaskForm
 from database.sqldb import db as db
 import database.models.document as document_models
 import database.models.blog as blog_models
+import database.models.page as page_models
 import auth.auth as authentication
 import math, datetime, os
 import json
@@ -21,9 +22,6 @@ MAX_BLOGS_PER_PAGE		= 5
 BLOG_SPRING_SEMESTER	= datetime.date(year=1901, month=5, day=20)
 BLOG_SUMMER_SEMESTER	= datetime.date(year=1901, month=8, day=20)
 
-class AboutForm(FlaskForm):
-	delta = HiddenField('delta')
-
 @blueprint.route('/')
 def index():
 	return render_template('main/index.html')
@@ -33,12 +31,12 @@ def about():
 	from flask import current_app as app
 	about_page = os.path.join(app.config['ADMIN_GENERATED'], 'about')
 
-	form = AboutForm()
+	form = page_models.PageEditForm()
 	user = authentication.getCurrentUser()
 
 	contents = '[]'
 
-	if request.method == 'POST' and user != None and user.canWrite(blog_models.Blog_Post.__name__) and form.validate_on_submit():
+	if request.method == 'POST' and user != None and user.canWrite(page_models.Page.__name__) and form.validate_on_submit():
 		contents = form.delta.data
 		with open(about_page, 'w') as f:
 			f.write(contents)
@@ -54,7 +52,8 @@ def about():
 
 @blueprint.route('events')
 def events():
-	return render_template('main/events.html')
+	pages = page_models.getPagesByUserType(authentication.getCurrentUserType())
+	return render_template('main/events.html', pages=pages)
 
 @blueprint.route('blog')
 def blog():

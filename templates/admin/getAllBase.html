@@ -1,6 +1,5 @@
 {% extends 'admin/base.html' %}
 {% block dashboard_active %}active{% endblock %}
-{% import "main/utils.html" as utils %}
 {% block title %}{{model.__name__.replace('_', ' ').title()}}s{% endblock %}
 {% block breadcrumb %}
 	<li class="breadcrumb-item"><a href="{{url_for('admin.index')}}">Home</a></li>

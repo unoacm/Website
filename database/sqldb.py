@@ -8,7 +8,8 @@ DATABASE_MODELS = [
 	'UserAction',
 	'Member',
 	'Document',
-	'Blog_Post'
+	'Blog_Post',
+	'Page'
 ]
 
 EDITABLE_DATABASE_MODELS = [
@@ -16,7 +17,8 @@ EDITABLE_DATABASE_MODELS = [
 	'Document',
 	'Member',
 	'Suggestion',
-	'Blog_Post'
+	'Blog_Post',
+	'Page'
 ]
 
 

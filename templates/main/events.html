@@ -1,12 +1,29 @@
 {% extends 'main/base.html' %}
-{% import "main/utils.html" as utils %}
 {% block title %}Events{% endblock %}
 {% block events_active %}active{% endblock %}
 {% block content %}
-<div class="jumbotron jumbotron-fluid">
-	<div class="container">
-		<h1 class="display-4">No Information</h1>
-		<p class="lead">Sorry, we are currently updating this page. Check back again.</p>
+	<div class="container mt-5">
+		<div class="jumbotron jumbotron-fluid">
+			<div class="container">
+				<h1 class="display-4 text-center">Calendar</h1>
+			</div>
+		</div>
+		<h1 class="heading">Pages</h1>
+		<hr>
+		{% if pages|length == 0 %}
+			<div class="jumbotron jumbotron-fluid">
+				<div class="container">
+					<h1 class="display-4">No Pages</h1>
+					<p class="lead">Sorry, no pages are available at this time. Check back again.</p>
+				</div>
+			</div>
+		{% endif %}
+		<ul class="list-group">
+			{% for page in pages %}
+				<a href="{{page.getGetRoute()}}" class="list-group-item list-group-item-action">
+					{{page.title}} {% if page.access != 'public' %}<span class="text-danger">(This page is private)</span>{% endif %}
+				</a>
+			{% endfor %}
+		</ul>
 	</div>
-</div>
 {% endblock %}

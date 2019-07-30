@@ -47,7 +47,7 @@
 			</div>
 		</div>
 	{% endif %}
-	<div class="container mt-5">
+	<div class="container mt-3">
 		{% for blog, text in zip(blogs, texts) %}
 			{% for section, b in sections %}
 				{% if b == blog %}
@@ -57,7 +57,7 @@
 			<div class="card mb-5">
 				<div class="card-body">
 					<h5 class="card-title">{{blog.title}}</h5>
-					<h6 class="card-subtitle mb-2 text-muted">{{blog.created.strftime('%Y-%m-%d %I:%M %p')}}</h6>
+					<h6 class="card-subtitle mb-2 text-muted">{{blog.created.strftime('%Y-%m-%d %I:%M %p')}} {% if blog.access != 'public' %}<span class="text-danger">(This post is private)</span>{% endif %}</h6>
 					<p class="card-text {% if text|length >= text_length %}fade-text{% endif %}">
 						{{text[0:text_length]}}
 					</p>
@@ -65,24 +65,25 @@
 				</div>
 			</div>
 		{% endfor %}
-		<nav aria-label="Page navigation example">
-			<ul class="pagination justify-content-center">
-				<li class="page-item {% if page == 1 %}disabled{% endif %}">
-				<a class="page-link" href="{{url_for('main.blog_page', page=page-1, title=title_filter, year=year_filter, semester=semester_filter)}}" aria-label="Previous">
-					<span aria-hidden="true">&laquo;</span>
-				</a>
-				</li>
-				{% for p in range(1, maxPages+1) %}
-					<li class="page-item {% if page == p %}disabled{% endif %}">
-						<a class="page-link" href="{{url_for('main.blog_page', page=p, title=title_filter, year=year_filter, semester=semester_filter)}}">{{p}}</a>
-					</li>
-				{% endfor %}
-				<li class="page-item {% if page == maxPages %}disabled{% endif %}">
-				<a class="page-link" href="{{url_for('main.blog_page', page=page+1, title=title_filter, year=year_filter, semester=semester_filter)}}" aria-label="Next">
-					<span aria-hidden="true">&raquo;</span>
-				</a>
-				</li>
-			</ul>
-		</nav>
 	</div>
+	<hr>
+	<nav aria-label="Page navigation example">
+		<ul class="pagination justify-content-center">
+			<li class="page-item {% if page == 1 %}disabled{% endif %}">
+			<a class="page-link" href="{{url_for('main.blog_page', page=page-1, title=title_filter, year=year_filter, semester=semester_filter)}}" aria-label="Previous">
+				<span aria-hidden="true">&laquo;</span>
+			</a>
+			</li>
+			{% for p in range(1, maxPages+1) %}
+				<li class="page-item {% if page == p %}disabled{% endif %}">
+					<a class="page-link" href="{{url_for('main.blog_page', page=p, title=title_filter, year=year_filter, semester=semester_filter)}}">{{p}}</a>
+				</li>
+			{% endfor %}
+			<li class="page-item {% if page == maxPages %}disabled{% endif %}">
+			<a class="page-link" href="{{url_for('main.blog_page', page=page+1, title=title_filter, year=year_filter, semester=semester_filter)}}" aria-label="Next">
+				<span aria-hidden="true">&raquo;</span>
+			</a>
+			</li>
+		</ul>
+	</nav>
 {% endblock %}
