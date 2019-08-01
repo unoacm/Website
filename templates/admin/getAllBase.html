@@ -1,13 +1,14 @@
 {% extends 'admin/base.html' %}
 {% block dashboard_active %}active{% endblock %}
-{% block title %}{{model.__name__.replace('_', ' ').title()}}s{% endblock %}
+{% set model_pretty = model.__name__.lower().replace('_', ' ').title() %}
+{% block title %}{{model_pretty}}s{% endblock %}
 {% block breadcrumb %}
 	<li class="breadcrumb-item"><a href="{{url_for('admin.index')}}">Home</a></li>
 	<li class="breadcrumb-item active">{{model.__name__.capitalize().replace('_', ' ')}}s</li>
 {% endblock %}
 {% block content %}
 	<div class="ml-2">
-		<h4 class="d-inline-block text-muted">Select {{model.__name__.lower().replace('_', ' ').title()}} to change</h4>
+		<h4 class="d-inline-block text-muted">Select {{model_pretty}} to change</h4>
 		{% with messages = get_flashed_messages(with_categories=True) %}
 			{% if messages %}
 			<div id="flashes" class="d-inline-block">
@@ -25,20 +26,23 @@
 		{% endif %}
 	</div>
 	<div>
-		<div class="ml-2 my-4 py-2 d-flex flex-row bg-light w-100">
+		<div class="ml-2 my-4 py-2 d-flex flex-row bg-light w-100 align-items-center">
 			<img class="ml-1" src="{{url_for('static', filename='icons/search.svg')}}" >
 			<div class="input-group input-group-sm d-inline-block">
-				<input id="search" type="text" class="form-control d-inline-block w-50 rounded-pill">
-				<button type="button" onclick="search('search')" class="btn btn-outline-secondary btn-sm">Search</button>
+				<input id="search" type="text" class="form-control d-inline-block w-50 rounded-pill" onkeyup="search('search')" onkeydown="search('search')">
+				<button type="button" onclick="resetSearch('search')" class="btn btn-outline-secondary btn-sm">Reset</button>
 			</div>
 		</div>
-		<div class="text-muted d-flex flex-row ml-4 mb-3 w-50">
+		<div class="text-muted d-flex flex-row ml-4 mb-3 w-50 align-items-center">
 			<div class="text-muted input-group w-75" id="action-select-group">
 				<label for="action-select">Action:</label>
-				<select class="ml-2 custom-select rounded mr-2" id="action-select">
+				<select class="mx-2 custom-select rounded h-100" id="action-select">
 					<option selected>---------</option>
+					{% for action in actions %}
+						<option>{{action}}</option>
+					{% endfor %}
 				</select>
-				<button class="btn btn-outline-secondary btn-sm mr-2">Go</button>
+				<button onclick="sendAction()" class="btn btn-outline-secondary btn-sm mr-2">Go</button>
 			</div>
 			<span><span id="selectedAmount">0</span> of <span id="maxAmount">{{data|length}}</span> selected</span>
 		</div>
@@ -61,7 +65,7 @@
 			<tbody>
 				{% for datum in data %}
 					{% set firstFound = {'found': True} %}
-					<tr>
+					<tr unique="{{datum['id']}}">
 						<td>
 							<div class="checkbox">
 								<input type="checkbox" id="checkbox-{{datum['id']}}" onchange="checkboxChange(this)">
@@ -84,7 +88,7 @@
 			</tbody>
 		</table>
 		<div class="ml-4 text-muted">
-			<span id="amount">{{data|length}}</span> {{model.__name__.lower().replace('_', ' ').title()}}{% if data|length != 1 %}s{% endif %}
+			<span id="amount" tag="{{model_pretty}}">{{data|length}}</span> <span id="model-amount-tag">{{model_pretty}}{% if data|length != 1 %}s{% endif %}</span>
 		</div>
 		<div id="model-count-line" class="ml-3">
 			<hr>

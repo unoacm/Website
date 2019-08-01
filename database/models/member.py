@@ -4,6 +4,8 @@ from flask_wtf import FlaskForm
 import auth.auth as authentication
 from database.models.user import UserAction
 import datetime
+import csv
+import io
 from wtforms import (
 	StringField, SubmitField, PasswordField
 )
@@ -11,7 +13,7 @@ from wtforms.validators import (
 	DataRequired
 )
 from flask import (
-	Blueprint, render_template, redirect, url_for, session, flash, request
+	Blueprint, render_template, redirect, url_for, session, flash, request, Response
 )
 
 class MemberCreateForm(FlaskForm):
@@ -55,6 +57,8 @@ class Member(db.Model):
 		return url_for('member.member_delete', member_id=self.id)
 
 blueprint = Blueprint('member', __name__, url_prefix='/member')
+
+actions = ['Export to CSV']
 
 @blueprint.route('/new', methods=['GET', 'POST'])
 @authentication.can_write(Member.__name__)
@@ -120,8 +124,24 @@ def member_delete(member_id):
 
 	return redirect(Member.getAllRoute())
 
-@blueprint.route('members')
+@blueprint.route('members', methods=['GET', 'POST'])
 @authentication.can_read(Member.__name__)
 def members_get():
+	if request.method == 'POST':
+		data = request.get_json()
+		if data != None:
+			members = [Member.exists_id(id) for id in data['ids']]
+			if all((member != None for member in members)):
+				if data['action'] == 'Export to CSV':
+					with io.StringIO() as csvfile:
+						csvwriter = csv.writer(csvfile, delimiter=",", quotechar="'")
+						csvwriter.writerow(['First Name', 'Last Name', 'Email'])
+						for member in members:
+							csvwriter.writerow([member.first_name, member.last_name, member.email])
+						return Response(csvfile.getvalue(), mimetype="text/csv", headers={"Content-Disposition": "attachment;filename=members.csv", "Download": "yes"})
+			else:
+				flash('Not all members that were selected exist anymore', 'warning')
+
+
 	members = Member.query.all()
-	return authentication.auth_render_template('admin/getAllBase.html', data=members, model=Member, hidden_fields=Member.hidden_fields)
+	return authentication.auth_render_template('admin/getAllBase.html', data=members, model=Member, hidden_fields=Member.hidden_fields, actions=actions)
