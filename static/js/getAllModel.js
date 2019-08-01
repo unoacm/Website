@@ -109,7 +109,7 @@ function sendAction() {
 				}
 			}
 			else {
-				window.lcation.href = document.URL;
+				window.location.href = document.URL;
 			}
 		}
 	};
