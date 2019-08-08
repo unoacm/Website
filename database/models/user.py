@@ -26,7 +26,8 @@ class UserEditForm(UserCreateForm):
 	password = PasswordField("Password", description='This value is hashed, so it is not visible. To keep the old password, leave this blank.')
 
 for model in EDITABLE_DATABASE_MODELS: # Dynamically creating fields for each editable model in the database
-	field = RadioField(f'{model} Access', choices=[('read', 'Read'), ('write', 'Write'), ('none', 'None')], validators=[Required()], default='read')
+	model_name = model.replace('_', ' ').title()
+	field = RadioField(f'{model_name} Access', choices=[('read', 'Read'), ('write', 'Write'), ('none', 'None')], validators=[Required()], default='read')
 	setattr(UserCreateForm, f'{model.lower()}Access', field)
 	setattr(UserEditForm, f'{model.lower()}Access', field)
 

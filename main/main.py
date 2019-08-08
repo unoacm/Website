@@ -9,6 +9,7 @@ from database.sqldb import db as db
 import database.models.document as document_models
 import database.models.blog as blog_models
 import database.models.page as page_models
+import database.models.home_object as home_object_models
 import auth.auth as authentication
 import math, datetime, os
 import json
@@ -24,7 +25,11 @@ BLOG_SUMMER_SEMESTER	= datetime.date(year=1901, month=8, day=20)
 
 @blueprint.route('/')
 def index():
-	return render_template('main/index.html')
+	latest_blog 			= blog_models.Blog_Post.query.filter(blog_models.Blog_Post.access == authentication.PUBLIC).order_by(blog_models.Blog_Post.created).first()
+	pages 					= page_models.Page.query.filter(page_models.Page.access == authentication.PUBLIC).all()
+	home_objects			= home_object_models.Home_Object.query.all()
+	home_object_categories	= set(home_object.category for home_object in home_objects)
+	return render_template('main/index.html', latest_blog=latest_blog, pages=pages, home_objects=home_objects, home_object_categories=home_object_categories)
 
 @blueprint.route('about', methods=['GET', 'POST'])
 def about():
@@ -76,13 +81,6 @@ def blog_page(page):
 		semester_filter = None
 
 	blog_posts = [post for post in blog_models.getBlogsByUserType(authentication.getCurrentUserType()) if filter_post(post, title_filter, year_filter, semester_filter)]
-	blog_texts = [json.loads(x.content) for x in blog_posts]
-	for i,text in enumerate(blog_texts):
-		actual_text = ''
-		for section in text['ops']:
-			if type(section['insert']) == str:
-				actual_text += section['insert']
-		blog_texts[i] = actual_text
 
 	if len(blog_posts) == 0 or max(1, math.ceil(len(blog_posts) / MAX_BLOGS_PER_PAGE)) < page:
 		page = 1
@@ -98,7 +96,6 @@ def blog_page(page):
 	return authentication.auth_render_template(
 		'main/blog.html', 
 		blogs=blog_posts[(page - 1) * MAX_BLOGS_PER_PAGE:MAX_BLOGS_PER_PAGE * page],
-		texts=blog_texts[(page - 1) * MAX_BLOGS_PER_PAGE:MAX_BLOGS_PER_PAGE * page],
 		sections=sections,
 		title_filter=title_filter,
 		year_filter=year_filter,

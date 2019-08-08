@@ -1,10 +1,111 @@
 {% extends "main/base.html" %}
 {% block title %}Home{% endblock %}
 {% block content %}
-<div class="jumbotron jumbotron-fluid">
+
+	<link rel="stylesheet" href="{{url_for('static', filename='css/katex.min.css')}}">
+	<script src="{{url_for('static', filename='js/katex.min.js')}}"></script>
+
+	<link href="{{url_for('static', filename='css/darcula.css')}}" rel="stylesheet">
+	<script src="{{url_for('static', filename='js/highlight.min.js')}}"></script>
+
+	<script src="{{url_for('static', filename='js/quill.min.js')}}"></script>
+	<link rel="stylesheet" href="{{url_for('static', filename='css/quill.snow.css')}}">
+
+	{% set text_length = 350 %}
 	<div class="container">
-		<h1 class="display-4">No Information</h1>
-		<p class="lead">Sorry, we are currently updating this page. Check back again.</p>
+		<div class="jumbotron" style="background: center/100% no-repeat url({{url_for('static', filename='images/home_banner2.jpg')}})">
+			<div class="container">
+				<h1 class="display-4">Association for Computer Machinery</h1>
+				<h1 class="display-5">University of Nebraska Student Chapter</h1>
+			</div>
+		</div>
+		<hr>
+		<div class="shadow-sm p-4 bg-white">
+			<h1 class="text-center mb-3">Most Recent Blog Post</h1>
+			<div class="container">
+				{% if latest_blog == None %}
+					<div class="jumbotron jumbotron-fluid">
+						<div class="container">
+							<h1 class="display-4">No Blog Posts</h1>
+							<p class="lead">Sorry, no blog posts are available at this time. Check back again.</p>
+						</div>
+					</div>
+				{% else %}
+				<div class="card mb-5">
+					<div class="card-body">
+						{% set blog_text = latest_blog.get_blog_text() %}
+						<h5 class="card-title">{{latest_blog.title}}</h5>
+						<h6 class="card-subtitle mb-2 text-muted">{{latest_blog.created.strftime('%Y-%m-%d %I:%M %p')}}</h6>
+						<p class="card-text {% if blog_text|length >= text_length %}fade-text{% endif %}">
+							{{blog_text[0:text_length]}}
+						</p>
+						<a href="{{latest_blog.getGetRoute()}}" class="card-link">Read More</a>
+					</div>
+				</div>
+				{% endif %}
+			</div>
+		</div>
+		<hr>
+		<div class="shadow-sm p-4 bg-white">
+			<h1 class="text-center mb-3">Our Current Pages</h1>
+			<div class="container-fluid">
+			{% if pages|length == 0 %}
+				<div class="jumbotron jumbotron-fluid">
+					<div class="container">
+						<h1 class="display-4">No Pages</h1>
+						<p class="lead">Sorry, no pages are available at this time. Check back again.</p>
+					</div>
+				</div>
+			{% else %}
+				<div class="row">
+					{% for page in pages %}
+						<div class="col-4 mt-3">
+							<a class="card" href="{{page.getGetRoute()}}" style="text-decoration: none;">
+								<div class="card-body text-center">
+									{{page.title}}
+								</div>
+							</a>
+						</div>
+					{% endfor %}
+				</div>	
+			{% endif %}
+			</div>
+		</div>
+		<hr>
+		{% set past_category = None %}
+		{% for category in home_object_categories %}
+			<div class="shadow-sm p-4 bg-white">
+				<h1 class="text-center mb-3">{{category}}</h1>
+				<div class="container-fluid">
+					{% for home_object in home_objects if home_object.category == category %}
+						<div class="card mb-3">
+							<div class="card-body">
+								<h5 class="card-title">{{home_object.title}}</h5>
+								<p class="card-text">
+									<div id="home_object_{{home_object.id}}" class='quill-spot' data="{{home_object.content}}"></div>
+								</p>
+							</div>
+						</div>
+					{% endfor %}
+				</div>
+			</div>
+			<hr>
+		{% endfor %}
+
+		<script>
+			var quillContainers = [];
+			var quillElements	= document.getElementsByClassName('quill-spot');
+
+			for(let i = 0; i < quillElements.length; i++) {
+				quillContainers.push(new Quill('#' + quillElements[i].id, {
+					modules: {
+						syntax: true
+					},
+					readOnly: true
+				}));
+
+				quillContainers[i].setContents(JSON.parse(quillElements[i].getAttribute('data')));
+			}
+			</script>
 	</div>
-</div>
 {% endblock %}

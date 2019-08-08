@@ -9,7 +9,8 @@ DATABASE_MODELS = [
 	'Member',
 	'Document',
 	'Blog_Post',
-	'Page'
+	'Page',
+	'Home_Object'
 ]
 
 EDITABLE_DATABASE_MODELS = [
@@ -18,7 +19,8 @@ EDITABLE_DATABASE_MODELS = [
 	'Member',
 	'Suggestion',
 	'Blog_Post',
-	'Page'
+	'Page',
+	'Home_Object'
 ]
 
 

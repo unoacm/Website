@@ -176,8 +176,13 @@
 		<script>
 			var hidden_text_field = document.getElementById('delta');
 			var quillTextArea = document.getElementsByClassName("ql-editor");
-			quillTextArea[0].contentEditable = 'false';
-
+		</script>
+		{% if type == 'edit' %}
+			<script>
+				quillTextArea[0].contentEditable = 'false';
+			</script>
+		{% endif %}
+		<script>
 			var submit_entry = function(event) {
 				hidden_text_field.value = JSON.stringify(quill.getContents());
 			}
@@ -191,7 +196,7 @@
 {% endblock %}
 {% block footer %}
 	{{super()}}
-	{% if user.canWrite(model.__name__) and type=='edit' %}
+	{% if user.canWrite(model.__name__) and type == 'edit' %}
 		<script src="{{url_for('static', filename='js/model.js')}}"></script>
 		<script src="{{url_for('static', filename='js/alertFade.js')}}"></script>
 		<script src="{{url_for('static', filename='js/deleteLinks.js')}}"></script>

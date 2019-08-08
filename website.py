@@ -13,6 +13,7 @@ import database.models.suggestion as suggestion_models
 import database.models.document as document_models
 import database.models.blog as blog_models
 import database.models.page as page_models
+import database.models.home_object as home_object_models
 import auth.auth as authentication
 
 app = Flask(__name__)
@@ -53,6 +54,7 @@ app.register_blueprint(suggestion_models.blueprint)
 app.register_blueprint(document_models.blueprint)
 app.register_blueprint(blog_models.blueprint)
 app.register_blueprint(page_models.blueprint)
+app.register_blueprint(home_object_models.blueprint)
 
 default_admin = user_models.User.query.filter_by(username=ACM_FLASK_ADMIN_USERNAME).first()
 

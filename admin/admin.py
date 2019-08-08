@@ -21,6 +21,7 @@ import database.models.member as member_models
 import database.models.document as document_models
 import database.models.blog as blog_models
 import database.models.page as page_models
+import database.models.home_object as home_object_models
 import datetime, collections
 
 class UserLoginForm(FlaskForm):
@@ -47,7 +48,8 @@ model_data["EXTERNAL"] = \
 	["Suggestions", suggestion_models.Suggestion],
 	["Documents", document_models.Document],
 	["Blog Posts", blog_models.Blog_Post],
-	["Pages", page_models.Page]
+	["Pages", page_models.Page],
+	['Home Objects', home_object_models.Home_Object]
 ]
 
 @blueprint.route('/')

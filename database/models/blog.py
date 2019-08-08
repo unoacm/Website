@@ -11,6 +11,7 @@ from flask import (
 from database.sqldb import db as db
 import auth.auth as authentication
 import datetime
+import json
 from database.models.user import UserAction
 
 class BlogPostForm(FlaskForm):
@@ -62,6 +63,14 @@ class Blog_Post(db.Model):
 
 	def getGetRoute(self):
 		return url_for('blog_post.blog_post_get', blog_post_id=self.id)
+
+	def get_blog_text(self):
+		actual_text = ''
+		blog_parsed_json = json.loads(self.content)
+		for section in blog_parsed_json['ops']:
+			if type(section['insert']) == str:
+				actual_text += section['insert']
+		return actual_text
 
 blueprint = Blueprint('blog_post', __name__, url_prefix='/blog')
 

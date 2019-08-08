@@ -48,7 +48,8 @@
 		</div>
 	{% endif %}
 	<div class="container mt-3">
-		{% for blog, text in zip(blogs, texts) %}
+		{% for blog in blogs %}
+			{% set blog_text = blog.get_blog_text() %}
 			{% for section, b in sections %}
 				{% if b == blog %}
 					<h1 class="bg-light mb-4 p-3">{{section}}</h1>
@@ -58,8 +59,8 @@
 				<div class="card-body">
 					<h5 class="card-title">{{blog.title}}</h5>
 					<h6 class="card-subtitle mb-2 text-muted">{{blog.created.strftime('%Y-%m-%d %I:%M %p')}} {% if blog.access != 'public' %}<span class="text-danger">(This post is private)</span>{% endif %}</h6>
-					<p class="card-text {% if text|length >= text_length %}fade-text{% endif %}">
-						{{text[0:text_length]}}
+					<p class="card-text {% if blog_text|length >= text_length %}fade-text{% endif %}">
+						{{blog_text[0:text_length]}}
 					</p>
 					<a href="{{blog.getGetRoute()}}" class="card-link">Read More</a>
 				</div>
