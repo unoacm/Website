@@ -168,8 +168,21 @@ def user_new():
 			user 		= authentication.getCurrentUser()
 			username 	= createForm.username.data
 			password 	= createForm.password.data
+			reads 	= []
+			writes 	= []
+
+			for model in EDITABLE_DATABASE_MODELS:
+				access = createForm.__getattribute__(f'{model.lower()}Access').data
+				if access == 'read':
+					reads.append(model)
+				elif access == 'write':
+					writes.append(model)
+
 			if User.exists(username, password) == None:
+
 				newUser = User(username=username, password=password)
+				newUser.addRead(reads)
+				newUser.addWrite(writes)
 				db.session.add(newUser)
 				user.actions.append(UserAction(model_type=User.__name__, model_title=username, action='Created', when=datetime.datetime.now()))
 				db.session.commit()

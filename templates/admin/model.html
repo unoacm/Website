@@ -1,5 +1,5 @@
 {% extends 'admin/base.html' %}
-{% block title %}{% endblock %}
+{% block title %}{{model.__name__.replace("_", "").title()}}{% endblock %}
 {% block breadcrumb %}
 	<li class="breadcrumb-item"><a href="{{url_for('admin.index')}}">Home</a></li>
 	<li class="breadcrumb-item"><a href="{{model.getAllRoute()}}">{{model.__name__.replace('_', ' ').title()}}s</a></li>

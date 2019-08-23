@@ -76,7 +76,7 @@ def member_new():
 			user.actions.append(UserAction(model_type=Member.__name__, model_title=first_name+' '+last_name, action='Created', when=datetime.datetime.now()))
 			db.session.commit()
 			flash('Member Created', 'success')
-			return redirect(newMember.getEditRoute())
+			return redirect(Member.getAllRoute())
 	
 	return authentication.auth_render_template('admin/model.html', form=memberForm, type='new', model=Member, breadcrumbTitle='New Member')
 

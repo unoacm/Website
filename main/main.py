@@ -25,7 +25,7 @@ BLOG_SUMMER_SEMESTER	= datetime.date(year=1901, month=8, day=20)
 
 @blueprint.route('/')
 def index():
-	latest_blog 			= blog_models.Blog_Post.query.filter(blog_models.Blog_Post.access == authentication.PUBLIC).order_by(blog_models.Blog_Post.created).first()
+	latest_blog 			= blog_models.Blog_Post.query.filter(blog_models.Blog_Post.access == authentication.PUBLIC).order_by(blog_models.Blog_Post.created.desc()).first()
 	pages 					= page_models.Page.query.filter(page_models.Page.access == authentication.PUBLIC).all()
 	home_objects			= home_object_models.Home_Object.query.all()
 	home_object_categories	= set(home_object.category for home_object in home_objects)

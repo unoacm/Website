@@ -38,7 +38,7 @@ model_data["AUTHENTICATION AND AUTHORIZATION"] = \
 	["Users", user_models.User]
 ]
 
-model_data["INTERAL"] = \
+model_data["INTERNAL"] = \
 [
 	["Members", member_models.Member]
 ]

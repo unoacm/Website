@@ -56,6 +56,10 @@ app.register_blueprint(blog_models.blueprint)
 app.register_blueprint(page_models.blueprint)
 app.register_blueprint(home_object_models.blueprint)
 
+@app.errorhandler(404)
+def page_not_found(error):
+	return render_template('main/404.html'), 404
+
 default_admin = user_models.User.query.filter_by(username=ACM_FLASK_ADMIN_USERNAME).first()
 
 if not default_admin:
