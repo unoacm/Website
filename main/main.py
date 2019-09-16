@@ -55,10 +55,29 @@ def about():
 	
 	return authentication.auth_render_template('main/about.html', form=form)
 
-@blueprint.route('events')
+@blueprint.route('events', methods=['GET', 'POST'])
 def events():
+	from flask import current_app as app
+	calendar_html = os.path.join(app.config['ADMIN_GENERATED'], 'calendar')
+
+	form = page_models.CalendarForm()
+	user = authentication.getCurrentUser()
+
+	contents = ''
+
+	if request.method == 'POST' and user != None and user.canWrite(page_models.Page.__name__) and form.validate_on_submit():
+		contents = form.html.data
+		with open(calendar_html, 'w') as f:
+			f.write(contents)
+	else:
+		if os.path.exists(calendar_html):
+			with open(calendar_html, 'r') as f:
+				contents = f.read()
+
+	form.html.data = contents
+
 	pages = page_models.getPagesByUserType(authentication.getCurrentUserType())
-	return render_template('main/events.html', pages=pages)
+	return authentication.auth_render_template('main/events.html', pages=pages, form=form)
 
 @blueprint.route('blog')
 def blog():

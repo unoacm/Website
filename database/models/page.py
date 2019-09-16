@@ -25,6 +25,9 @@ class PageForm(FlaskForm):
 class PageEditForm(FlaskForm):
 	delta = HiddenField('delta')
 
+class CalendarForm(FlaskForm):
+	html = StringField("HTML")
+
 class Page(db.Model):
 	id				= db.Column(db.Integer, primary_key=True)
 	title			= db.Column(db.String(), nullable=False)

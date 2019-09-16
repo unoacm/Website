@@ -3,12 +3,63 @@
 {% block events_active %}active{% endblock %}
 {% block content %}
 	<div class="container mt-5">
-		<div class="jumbotron jumbotron-fluid">
-			<div class="container">
-				<h1 class="display-4 text-center">Calendar</h1>
+		{% if isLoggedIn and user.canWrite('Page') %}
+			<div class="d-flex justify-content-end" id="options">
+				<template id="editOption">
+					<button type="button" class="btn btn-warning mr-3 mb-2" id="editButton" onclick="edit()">
+						Edit <img class="icon ml-1" style="vertical-align: -2px;" src="{{url_for('static', filename='icons/si-glyph-edit.svg')}}" >
+					</button>
+				</template>
+				<template id="otherOptions">
+					<button type='submit' form="calendar-form" class='btn btn-success mr-2 mb-2'>
+						Submit <img class="icon ml-1" style="vertical-align: -2px;" src="{{url_for('static', filename='icons/check_circle.svg')}}" >
+					</button>
+					<button onclick='edit()' type='button' class='btn btn-primary mr-3 mb-2'>
+						Cancel <img class="icon ml-1" style="vertical-align: -2px;" src="{{url_for('static', filename='icons/cancel.svg')}}" >
+					</button>
+				</template>
 			</div>
+
+			<form id="calendar-form" action="" method="POST" enctype="multipart/form-data">
+				{{form.csrf_token()}}
+				{% for field in form if field.name not in ['csrf_token', 'next'] %}
+					<div class="form-group">
+						{{field(class_="form-control field")}}
+					</div>
+				{% endfor %}
+			</form>
+
+			<script>
+				var editMode = true;
+				var options = document.getElementById('options');
+				var editOptionTemplate = document.getElementById('editOption')
+				var otherOptionsTemplate = document.getElementById('otherOptions')
+				var calendarForm = document.getElementById('calendar-form')
+
+				function edit() {
+					var clone = null;
+					if(editMode) {
+						clone = editOptionTemplate.content.cloneNode(true);
+						calendarForm.style.display = 'none';
+					}
+					else {
+						clone = otherOptionsTemplate.content.cloneNode(true);
+						calendarForm.style.display = '';
+					}
+
+					editMode = !editMode;
+					options.innerHTML = '';
+					options.appendChild(clone);
+				}
+
+				edit();
+			</script>
+		{% endif %}
+		<div id="calendar-section">
+			{{form.html.data|safe}}
 		</div>
-		<h1 class="heading">Pages</h1>
+		
+		<h1 class="heading mt-5">Pages</h1>
 		<hr>
 		{% if pages|length == 0 %}
 			<div class="jumbotron jumbotron-fluid">
